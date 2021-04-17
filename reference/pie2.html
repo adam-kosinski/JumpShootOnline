@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+         <meta charset="href-8"/>
+         <title>Project Proposal</title>
+         <link rel="stylesheet" href="stylesheet2.css"/>
+</head>
+<body>
+	<div id="lightener"></div>
+
+    <h1><b>Our Project Scheme</b></h1>
+
+    <p><i>Noah & Adam</i></p>
+
+    <h2>JumpShoot: Rise of the Big Chungus.</h2>
+
+    <p><i>Description:</i></p>
+
+    <p>The objective is to make a two-player jumping game using java. 
+    There will be multiple platforms that players can jump on to avoid 
+    being brutally shot by one another. The player's job is to not be a failure 
+    and lose all three of their lives. Whoever survives is the winner.</p>
+	<h2>Player Movement</h2>
+	<p>Movement will be controlled by 4 keys (e.g. the WASD keys).
+	The up key will cause the player to jump. Jumping is currently only allowed if the player
+	is on a platform, however we hope to add double jumping as a feature. Longer key presses
+	of the jump key will result in higher jumps. The left and right keys will cause the player to
+	move in that direction at a constant speed while they are pressed down, even if the player is in
+	the air. The down key will cause the player to accelerate downwards faster than normal.</p>
+	
+	<h2>Shooting</h2>
+	<p>There will be one or multiple balls in play. The balls can be in two different states,
+	dangerous and pickupable. The default state of a ball is pickupable.
+	If a ball is pickupable, a player can press a key to pick it up. Players
+	can only hold one ball at a time. If a player has a ball, they can shoot/throw it.
+	A ball is dangerous after a player throws it until it hits a wall. It then
+	becomes pickupable. If a player comes into contact with a dangerous ball, they lose a life.
+	A player dies when all their lives are gone.
+	
+	<h2>Fun Stuff</h2>
+	<p>We anticipate making the balls look like rabbit (Chungus) heads.</p>
+
+    <h2>Main Objectives:</h2>
+
+    <div class="center">
+		1. Kill <br>
+		2. Don't be killed <br>
+		3. Win
+   </div>
+   <p>Here is a taste of our delicous code (yum):</p>
+   <div class="code_container">
+		<p>JumpShoot.java</p>
+		<iframe src="JumpShoot.java" width="700" height="500"></iframe>
+	</div>
+	<div class="code_container">
+		<p>Player.java</p>
+		<iframe src="Player.java" width="700" height="500"></iframe>
+	</div>
+	<div class="code_container">
+		<p>Wall.java</p>
+		<iframe src="Wall.java" width="700" height="500"></iframe>
+	</div>
+   
+   <p>Here is the result (box can move around and jump in reaction to arrow key presses):</p>
+   <img src="example.PNG"/>
+</div>
+</body>
+</html>
