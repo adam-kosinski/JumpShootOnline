@@ -1,0 +1,65 @@
+/* z-index table
+
+*/
+
+
+html, body {
+	margin: 0;
+	position: relative;
+}
+
+body * {
+	position: absolute;
+	font-family: sans-serif;
+	user-select: none;
+}
+
+p {
+	margin: 0;
+}
+
+
+/* home screen ----------------------------------------------------*/
+#home_screen {
+	display: none;
+	width: 100vw;
+	height: 100vh;
+	background-color: lightblue;
+	position: fixed;
+}
+
+#home_screen * {
+	left: 0;
+	right: 0;
+	margin: auto;
+	text-align: center;
+}
+
+#home_screen h1 {
+	top: 10px;
+}
+
+#player_display {
+	background-color: white;
+	width: 80vw;
+	height: 20vh;
+	top: 60vh;
+}
+
+#player_display div { /*divs will be added to the player display wrapper div as players join*/
+	position: relative;
+	width: 100px;
+	border: 1px solid gray;
+	padding: 5px;
+	display: inline-block;
+	margin: 10px;
+}
+
+#start_button {
+	width: 200px;
+	font-size: 24px;
+	top: 85vh;
+	cursor: pointer;
+}
+
+
