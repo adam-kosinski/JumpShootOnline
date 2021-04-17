@@ -85,5 +85,9 @@ socket.on("player_connection", function(player_statuses){
 
 
 socket.on("update", function(game){
-	console.log("got update");
+	let me;
+	game.players.forEach(p => {
+		if(p.name == my_name) me = p;
+	});
+	console.log(me.x, me.y);
 });

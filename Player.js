@@ -5,12 +5,14 @@ function getWalls(){return server.getGame().walls;}
 class Player
 {
 
-  constructor(x, y, width, AY, hat_src){
+  constructor(name, x, y, width, AY, hat_src){
     //x, y is initial position
     //width determines size of chungus
     //AY is gravitational acceleration
     //hat_src is name of image file
     //walls and balls are objects stored by the Game object
+
+    this.name = name;
 
   	this.x = x; //of top-left corner
   	this.xi = x; //initial x position (reset when velocity is reset)
@@ -66,7 +68,7 @@ class Player
     this.downKeyProcessed = false; //keeps track if we processed the first down key press, used so that we only process the first one
   }
 
-	handleKeyPress(key)
+	handleKeydown(key)
 	{
 		if(key == this.JUMP_KEY && this.y_collision == 1) //can only jump if on a platform
 		{
@@ -138,7 +140,7 @@ class Player
 		}
 	}
 
-	handleKeyRelease(key)
+	handleKeyup(key)
 	{
 		if(key == this.LEFT_KEY || key == this.RIGHT_KEY)
 		{

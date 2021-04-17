@@ -102,8 +102,8 @@ io.on("connection", function(socket) {
 
   socket.on("start_game", function(){
     console.log("Starting new game!");
-    game = new Game();
-    game.init();
+    let player_names = Object.keys(player_statuses);
+    game = new Game(player_names);
 
     //start game loop
     game_interval = setInterval(function(){
@@ -120,6 +120,25 @@ io.on("connection", function(socket) {
     game_interval = undefined;
   });
 
+
+  socket.on("keydown", function(key){
+    if(!game) return;
+
+    let player_name = id_to_name[socket.id];
+    game.players.forEach(p => {
+      if(p.name == player_name) p.handleKeydown(key);
+    });
+    //notice that this logic essentially prevents spectators from doing anything
+  });
+
+  socket.on("keyup", function(key){
+    if(!game) return;
+
+    let player_name = id_to_name[socket.id];
+    game.players.forEach(p => {
+      if(p.name == player_name) p.handleKeyup(key);
+    });
+  });
 
 });
 

@@ -4,7 +4,10 @@ let Wall = require("./Wall").Wall;
 
 
 class Game {
-	constructor(){
+	constructor(player_names){
+		this.player_names = player_names; //should be an array of two names
+		if(player_names.length != 2){throw new Error("Not two players");} //TODO: support an arbitrary number of players
+
 		this.players = [];
 		this.walls = [];
 		this.balls = [];
@@ -19,7 +22,9 @@ class Game {
 
 		//update loop
 		this.t_elapsed = 0;
-		this.LOOP_FREQ = 30; //hz
+		this.LOOP_FREQ = 10; //hz
+
+		this.init();
 	}
 
 	init(){
@@ -43,15 +48,15 @@ class Game {
 		*/
 
 		//create players
-		this.players.push(new Player(100, 200, 50, this.AY, "bowlinghat.png"));
-		this.players.push(new Player(200, 200, 50, this.AY, "cowboyhat.png"));
+		this.players.push(new Player(this.player_names[0], 100, 200, 50, this.AY, "bowlinghat.png"));
+		this.players.push(new Player(this.player_names[1], 200, 200, 50, this.AY, "cowboyhat.png"));
 	}
 
 	update(){
 		//update balls and players  NOTE: doing ball position before players will cause a lag in position when carrying balls... which looks cool!!!
 		this.balls.forEach(b => b.updatePosition(this.t_elapsed));
 		this.players.forEach(p => p.updatePosition(this.t_elapsed));
-		this.t_elapsed += 1000/this.LOOP_FREQ;
+		this.t_elapsed += 1/this.LOOP_FREQ;
 	}
 }
 
