@@ -7,19 +7,24 @@ let id; //id of the socket
 
 //send a new player message to the server, and pick name
 function registerName(){
-	//my_name declared in globals.js
 	my_name = prompt("Please enter a name (< 11 characters or display problems happen):"); //TODO: make this a GUI thing not a prompt
+
+	//filter out no name or canceling the popup
 	if(my_name===""){
-		registerName();
+		registerName(); //empty strings don't work, try again
 		return;
 	}
 	if(!my_name){
 		throw new Error("Name entry canceled, leaving webpage blank");
 	}
 
+	//check name
 	socket.emit("new player", my_name, function(success){
 		console.log("Name registration success:",success);
-		if(!success){
+		if(success || success === null) document.getElementById("load_screen").style.display = "none";
+		if(success === null) alert("You are viewing an ongoing game as a spectator. Once the game is cleared you will be able to join as a player.")
+
+		if(success === false){
 			alert("'"+my_name+"' is taken. Please choose another");
 			my_name = undefined;
 			registerName();
@@ -27,8 +32,7 @@ function registerName(){
 	});
 }
 
-registerName();
-
+console.log(registerName());
 
 //store the id of the connection
 socket.on("connect", function(){
@@ -42,7 +46,7 @@ socket.emit("get_state", function(player_statuses, game){
 	if(game){
 		game_active = true;
 		console.log("game already started");
-		//initialize game display
+		initCanvas(game);
 	}
 	else {
 		home_screen.style.display = "block";
@@ -89,5 +93,16 @@ socket.on("update", function(game){
 	game.players.forEach(p => {
 		if(p.name == my_name) me = p;
 	});
-	console.log(me.x, me.y);
+	if(me) console.log(me.x, me.y);
+});
+
+
+socket.on("start_game", function(game){
+	home_screen.style.display = "none";
+	initCanvas(game); //display.js
+	console.log("starting game");
+});
+
+socket.on("clear_game", function(){
+	home_screen.style.display = "block";
 });

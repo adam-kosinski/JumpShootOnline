@@ -59,7 +59,10 @@ io.on("connection", function(socket) {
 	socket.on("new player", function(name, callback){
 
 		if(!player_statuses.hasOwnProperty(name)){
-			if(game != undefined){return;} //don't count spectators as player_statuses. If the game ends, they can refresh and join as a player
+			if(game != undefined){  //don't count spectators as player_statuses. If the game ends, they can refresh and join as a player
+        callback(null); //null for spectators
+        return;
+      }
 
 			//new player
 			console.log("New player: " + name + " (id: " + socket.id + ")");
@@ -100,9 +103,9 @@ io.on("connection", function(socket) {
 
 
 
-  socket.on("start_game", function(){
+  socket.on("start_game", function(for_new_game=false){ //if for an immediate new game, keep same players
     console.log("Starting new game!");
-    let player_names = Object.keys(player_statuses);
+    let player_names = for_new_game && game ? game.player_names : Object.keys(player_statuses);
     game = new Game(player_names);
 
     //start game loop
@@ -110,14 +113,18 @@ io.on("connection", function(socket) {
       game.update.apply(game); //call .update() using the game as the 'this' object
       io.emit("update", game);
     }, 1000/game.LOOP_FREQ);
+
+    io.emit("start_game", game); //let everyone know
   });
 
 
-  socket.on("end_game", function(){
-    console.log("Clearing game");
+  socket.on("end_game", function(for_new_game=false){ //if for an immediate new game, don't need to tell the clients anything - they'll display the right thing on the next update
+    console.log("Ending game");
     if(game_interval) clearInterval(game_interval);
     game = undefined;
     game_interval = undefined;
+
+    if(!for_new_game) io.emit("clear_game");
   });
 
 

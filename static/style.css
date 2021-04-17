@@ -18,6 +18,16 @@ p {
 	margin: 0;
 }
 
+button {
+	cursor: pointer;
+}
+
+#load_screen {
+	width: 100vw;
+	height: 100vh;
+	background-color: black;
+	position: fixed;
+}
 
 /* home screen ----------------------------------------------------*/
 #home_screen {
@@ -55,11 +65,25 @@ p {
 	margin: 10px;
 }
 
-#start_button {
+#start_game_button {
 	width: 200px;
 	font-size: 24px;
 	top: 85vh;
-	cursor: pointer;
 }
 
 
+
+
+/* game ------------------------------------------------------*/
+
+#canvas {
+	border: 1px solid black;
+	position: static;
+	display: block;
+}
+
+#new_game_button, #clear_game_button {
+	position: static;
+	display: inline-block;
+	margin: 5px;
+}
