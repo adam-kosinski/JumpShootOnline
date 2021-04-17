@@ -1,4 +1,4 @@
-public class Wall
+class Wall
 {
 	constructor(x, y, width, height, color, border_wall=false)
 	{

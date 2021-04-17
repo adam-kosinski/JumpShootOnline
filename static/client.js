@@ -79,6 +79,11 @@ socket.on("player_connection", function(player_statuses){
 		}
 	}
 
-	//indicate disconnected in game GUI if game active TODO
+	//TODO: indicate disconnected in game GUI if game active TODO
 });
 
+
+
+socket.on("update", function(game){
+	console.log("got update");
+});

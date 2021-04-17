@@ -1,3 +1,8 @@
+let server = require("./server");
+function getBalls(){return server.getGame().balls;}
+function getWalls(){return server.getGame().walls;}
+
+
 /*class Ball
 {
 	private double x; // (x,y) of center
@@ -29,7 +34,7 @@
 	private ArrayList<Wall> walls;
 	private ArrayList<Ball> balls;
 
-	public Ball(double x, double y, double r, Color color, double ay)
+	constructor(x, y, r, color, AY)
 	{
 		this.x = x;
 		this.y = y;

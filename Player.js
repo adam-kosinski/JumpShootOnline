@@ -1,7 +1,11 @@
+let server = require("./server");
+function getBalls(){return server.getGame().balls;}
+function getWalls(){return server.getGame().walls;}
+
 class Player
 {
 
-  constructor(x, y, width, AY, hat_src, walls, balls){
+  constructor(x, y, width, AY, hat_src){
     //x, y is initial position
     //width determines size of chungus
     //AY is gravitational acceleration
@@ -46,7 +50,7 @@ class Player
     this.direction = "right"; //"left" or "right"; direction the player is facing
     //make sure this is consistent with the initialized shootAngle
 
-  	this.myBall = undefined;
+  	this.ballIndex = undefined; //undefined if not holding a ball, otherwise the index in balls where to find the ball
   	this.shootAngleArray = [0.05*Math.PI,0.25*Math.PI,0.75*Math.PI,0.95*Math.PI]; //stores possible shoot angles, from 0 to pi/2.  These are positive when shooting up as it appears on the canvas.
   	this.shootAngleIndex = 1; //index in shoot angle array to reference
   	this.shootAngle = -this.shootAngleArray[this.shootAngleIndex]; //in radians, actual angle of launch, in math coords, not canvas coords
@@ -60,9 +64,6 @@ class Player
     this.ROTATE_RIGHT_KEY = "p";
     this.BALL_KEY = "o";
     this.downKeyProcessed = false; //keeps track if we processed the first down key press, used so that we only process the first one
-
-  	this.walls = walls; //will be equal to the main array of these
-  	this.balls = balls;
   }
 
 	handleKeyPress(key)
@@ -97,17 +98,18 @@ class Player
 		}
 		else if(key == this.BALL_KEY)
 		{
-			if(!this.myBall) //try to grab a ball if we don't have one
+			if(!this.ballIndex) //try to grab a ball if we don't have one
 			{
 				//loop through available balls
-				for(let b of this.balls)
+				for(let i=0; i<getBalls().length; i++)
 				{
+          let b = getBalls()[i];
 					if(b.isDangerous() || b.isHeld()){continue;} //can't pick up dangerous or held balls
 
 					//if the center of the ball is within the player, we can pick it up
 					if(b.x > this.x && b.x < this.x+this.width && b.y > this.y && b.y < this.y+this.height)
 					{
-						this.myBall = b;
+						this.ballIndex = i;
 						b.pickup(this);
 						break; //stop searching for balls
 					}
@@ -191,8 +193,7 @@ class Player
 		let foundXCollision = false;
 		let foundYCollision = false;
 		//loop through walls
-		for(let w of this.walls)
-		{
+    getWalls().forEach(w => {
 			//y
 			//test collision below
 			if( (this.x+this.width > w.x && this.x < w.x+w.width) && (prev_y+this.height <= w.y && this.y+this.height >= w.y) ) //if in right x-range and collide vertically
@@ -243,14 +244,13 @@ class Player
 					this.ti_x = time;
 				}
 			}
-		} //finish looping through walls
+		}); //finish looping through walls
 		if(!foundXCollision) {this.x_collision = 0;}
 		if(!foundYCollision) {this.y_collision = 0;}
 
 		//check if a ball hit this player
-		for(let b of balls)
-		{
-			if(!b.isDangerous()){continue;}
+		getBalls().forEach(b => {
+			if(!b.isDangerous()){return;}
 
 			//if the center of the ball is within the player, and time since last hit is bigger than timeout, it hit us
 			if(b.x > this.x && b.x < this.x+this.width && b.y > this.y && b.y < this.y+this.height && time-this.t_threw_ball > this.INVINCIBLE_TIMEOUT)
@@ -262,7 +262,7 @@ class Player
 				//play chungus chuckle sound
 				// TODO
 			}
-		}
+		});
 	}
 
 	setXVelocity(vx)//time is the current time in seconds, from when the main animation timer started
@@ -292,18 +292,18 @@ class Player
 
 	shootBall()
 	{
-		if(!this.myBall){return;}
+		if(!this.ballIndex){return;}
 
-		let b = this.myBall;
+		let b = getBalls()[this.ballIndex];
 		b.release();
 		b.setXVelocity(this.SHOOT_VELOCITY * Math.cos(this.shootAngle));
 		b.setYVelocity(this.SHOOT_VELOCITY * Math.sin(this.shootAngle));
 
 		this.t_threw_ball = this.time;
 
-		myBall = undefined;
+		this.ballIndex = undefined;
 	}
 }
 
 
-exports.Game = Game;
+exports.Player = Player;

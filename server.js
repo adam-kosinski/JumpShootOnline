@@ -6,6 +6,8 @@ let http = require("http");
 let path = require("path");
 let socketIO = require("socket.io");
 
+let Game = require("./Game").Game;
+
 //app stuff
 let app = express();
 let server = http.Server(app);
@@ -43,7 +45,7 @@ let player_statuses = {}; //holds PlayerStatus objects (used for connect/disconn
 let id_to_name = {}; //maps socket ids to names. If a name isn't in here, player is disconnected
 
 let game = undefined; //undefined means no game currently going on
-
+let game_interval = undefined; //stores the setInterval return value for the game loop
 
 
 // WEBSOCKET HANDLERS --------------------------------------------------------------------------------------------------------------------
@@ -96,4 +98,31 @@ io.on("connection", function(socket) {
 	});
 
 
+
+
+  socket.on("start_game", function(){
+    console.log("Starting new game!");
+    game = new Game();
+    game.init();
+
+    //start game loop
+    game_interval = setInterval(function(){
+      game.update.apply(game); //call .update() using the game as the 'this' object
+      io.emit("update", game);
+    }, 1000/game.LOOP_FREQ);
+  });
+
+
+  socket.on("end_game", function(){
+    console.log("Clearing game");
+    if(game_interval) clearInterval(game_interval);
+    game = undefined;
+    game_interval = undefined;
+  });
+
+
 });
+
+
+
+exports.getGame = function(){return game;}
