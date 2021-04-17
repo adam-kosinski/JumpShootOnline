@@ -22,7 +22,7 @@ class Game {
 
 		//update loop
 		this.t_elapsed = 0;
-		this.LOOP_FREQ = 10; //hz
+		this.LOOP_FREQ = 30; //hz
 
 		this.init();
 	}

@@ -88,12 +88,8 @@ socket.on("player_connection", function(player_statuses){
 
 
 
-socket.on("update", function(game){
-	let me;
-	game.players.forEach(p => {
-		if(p.name == my_name) me = p;
-	});
-	if(me) console.log(me.x, me.y);
+socket.on("update", function(game){	
+	draw(game); //display.js
 });
 
 

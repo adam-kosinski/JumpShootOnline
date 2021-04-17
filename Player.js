@@ -140,13 +140,13 @@ class Player
 		}
 	}
 
-	handleKeyup(key)
+	handleKeyup(key, keys_down)
 	{
-		if(key == this.LEFT_KEY || key == this.RIGHT_KEY)
+		if(!keys_down.includes(this.LEFT_KEY) && !keys_down.includes(this.RIGHT_KEY))
 		{
 			this.setXVelocity(0); //since y velocity is governed by gravity, not resetting like with x velocity
 		}
-		else if(key == this.DOWN_KEY)
+		if(key == this.DOWN_KEY)
 		{
 			this.downKeyProcessed = false;
 		}
