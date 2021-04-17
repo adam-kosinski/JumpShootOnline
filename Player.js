@@ -304,3 +304,6 @@ class Player
 		myBall = undefined;
 	}
 }
+
+
+exports.Game = Game;
