@@ -32,7 +32,8 @@ function registerName(){
 	});
 }
 
-console.log(registerName());
+registerName();
+
 
 //store the id of the connection
 socket.on("connect", function(){
@@ -88,7 +89,7 @@ socket.on("player_connection", function(player_statuses){
 
 
 
-socket.on("update", function(game){	
+socket.on("update", function(game){
 	draw(game); //display.js
 });
 

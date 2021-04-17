@@ -28,7 +28,7 @@ function getWalls(){return server.getGame().walls;}
 	private int y_collision; // -1 means wall above, 0 means no collision, 1 means wall below
 
 	private boolean thrown = false; //balls are dangerous after a timeout after released, until stops moving
-	private double safe_timeout; //timeout after a ball is released before it becomes dangerous
+	private double safe_timeout; //timeout after a ball is released before it becomes dangerous (more for aesthetics to reinforce the player invincibility mechanic)
 	private Optional<Player> holder;
 
 	private ArrayList<Wall> walls;
@@ -87,7 +87,7 @@ function getWalls(){return server.getGame().walls;}
 			x = holder.get().getX() + (holder.get().getWidth() / 2);
 			y = holder.get().getY() + (holder.get().getHeight() * 0.65);
 			x_collision = 0;
-			y_collision = 0; //if this is not set, it can effect calculations involving friction and cause dud shots where the ball goes straight up
+			y_collision = 0; //if this is not set, it can affect calculations involving friction and cause dud shots where the ball goes straight up
 			setXVelocity(0);
 			setYVelocity(0);
 			return;
