@@ -50,12 +50,12 @@ class Player
   	this.RED_COLOR_TIMEOUT = 0.5; //how long to make the player red after getting hit, in sec
 
     this.direction = "right"; //"left" or "right"; direction the player is facing
-    //make sure this is consistent with the initialized shootAngle
+    //make sure this is consistent with the initialized shoot_angle
 
-  	this.ballIndex = undefined; //undefined if not holding a ball, otherwise the index in balls where to find the ball
-  	this.shootAngleArray = [0.05*Math.PI,0.25*Math.PI,0.75*Math.PI,0.95*Math.PI]; //stores possible shoot angles, from 0 to pi/2.  These are positive when shooting up as it appears on the canvas.
-  	this.shootAngleIndex = 1; //index in shoot angle array to reference
-  	this.shootAngle = -this.shootAngleArray[this.shootAngleIndex]; //in radians, actual angle of launch, in math coords, not canvas coords
+  	this.ball_index = undefined; //undefined if not holding a ball, otherwise the index in balls where to find the ball
+  	this.shoot_angle_array = [0.05*Math.PI,0.25*Math.PI,0.75*Math.PI,0.95*Math.PI]; //stores possible shoot angles, from 0 to pi/2.  These are positive when shooting up as it appears on the canvas.
+  	this.shoot_angle_index = 1; //index in shoot angle array to reference
+  	this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index]; //in radians, actual angle of launch, in math coords, not canvas coords
   	this.SHOOT_VELOCITY = 500; //in px/s
 
     this.JUMP_KEY = "w";
@@ -100,7 +100,7 @@ class Player
 		}
 		else if(key == this.BALL_KEY)
 		{
-			if(!this.ballIndex) //try to grab a ball if we don't have one
+			if(!this.ball_index) //try to grab a ball if we don't have one
 			{
 				//loop through available balls
 				for(let i=0; i<getBalls().length; i++)
@@ -111,7 +111,7 @@ class Player
 					//if the center of the ball is within the player, we can pick it up
 					if(b.x > this.x && b.x < this.x+this.width && b.y > this.y && b.y < this.y+this.height)
 					{
-						this.ballIndex = i;
+						this.ball_index = i;
 						b.pickup(this);
 						break; //stop searching for balls
 					}
@@ -124,18 +124,18 @@ class Player
 		}
 		else if(key == this.ROTATE_LEFT_KEY)
 		{
-			if(this.shootAngleIndex < this.shootAngleArray.length - 1)
+			if(this.shoot_angle_index < this.shoot_angle_array.length - 1)
 			{
-				this.shootAngleIndex++;
-				this.shootAngle = -this.shootAngleArray[this.shootAngleIndex];
+				this.shoot_angle_index++;
+				this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index];
 			}
 		}
 		else if(key == this.ROTATE_RIGHT_KEY)
 		{
-			if(this.shootAngleIndex > 0)
+			if(this.shoot_angle_index > 0)
 			{
-				this.shootAngleIndex--;
-				this.shootAngle = -this.shootAngleArray[this.shootAngleIndex];
+				this.shoot_angle_index--;
+				this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index];
 			}
 		}
 	}
@@ -195,7 +195,7 @@ class Player
 		let foundXCollision = false;
 		let foundYCollision = false;
 		//loop through walls
-    getWalls().forEach(w => {
+		getWalls().forEach(w => {
 			//y
 			//test collision below
 			if( (this.x+this.width > w.x && this.x < w.x+w.width) && (prev_y+this.height <= w.y && this.y+this.height >= w.y) ) //if in right x-range and collide vertically
@@ -257,7 +257,7 @@ class Player
 			//if the center of the ball is within the player, and time since last hit is bigger than timeout, it hit us
 			if(b.x > this.x && b.x < this.x+this.width && b.y > this.y && b.y < this.y+this.height && time-this.t_threw_ball > this.INVINCIBLE_TIMEOUT)
 			{
-				this.health--;
+				this.health = Math.max(this.health - 1, 0);
 				b.setNotDangerous();
 				this.t_hit = time;
 
@@ -294,16 +294,16 @@ class Player
 
 	shootBall()
 	{
-		if(!this.ballIndex){return;}
+		if(!this.ball_index){return;}
 
-		let b = getBalls()[this.ballIndex];
+		let b = getBalls()[this.ball_index];
 		b.release();
-		b.setXVelocity(this.SHOOT_VELOCITY * Math.cos(this.shootAngle));
-		b.setYVelocity(this.SHOOT_VELOCITY * Math.sin(this.shootAngle));
+		b.setXVelocity(this.SHOOT_VELOCITY * Math.cos(this.shoot_angle));
+		b.setYVelocity(this.SHOOT_VELOCITY * Math.sin(this.shoot_angle));
 
 		this.t_threw_ball = this.time;
 
-		this.ballIndex = undefined;
+		this.ball_index = undefined;
 	}
 }
 

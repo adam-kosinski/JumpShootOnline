@@ -52,8 +52,8 @@ function draw(game){
       {
         ctx.setStroke("gray");
       /*  ctx.setLineDashes(p.width/5);
-        let ball = game.balls[p.ballIndex];
-        ctx.strokeLine(ball.x, ball.y, ball.x + p.width*Math.cos(p.shootAngle), ball.y + p.width*Math.sin(p.shootAngle));
+        let ball = game.balls[p.ball_index];
+        ctx.strokeLine(ball.x, ball.y, ball.x + p.width*Math.cos(p.shoot_angle), ball.y + p.width*Math.sin(p.shoot_angle));
 */
       }
   });

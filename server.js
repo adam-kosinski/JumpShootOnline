@@ -105,7 +105,9 @@ io.on("connection", function(socket) {
 
   socket.on("start_game", function(for_new_game=false){ //if for an immediate new game, keep same players
     console.log("Starting new game!");
+
     let player_names = for_new_game && game ? game.player_names : Object.keys(player_statuses);
+    player_names = player_names.filter(name => player_statuses[name].connected);
     game = new Game(player_names);
 
     //start game loop

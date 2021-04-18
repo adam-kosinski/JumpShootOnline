@@ -1,82 +1,42 @@
 let server = require("./server");
-function getBalls(){return server.getGame().balls;}
 function getWalls(){return server.getGame().walls;}
+function getPlayers(){return server.getGame().players;}
 
 
-/*class Ball
+class Ball
 {
-	private double x; // (x,y) of center
-	private double y;
-	private double r; //radius
-	private Color color;
-
-	private double xi; //initial x position (reset when velocity is reset)
-	private double yi; //initial y position (reset when velocity is reset)
-	private double vx;
-	private double vy;
-	private double ay;
-	private double x_friction_scalar; //must be < 1. During collisions, multiply vx by this^t (t in seconds) to simulate friction
-	private double x_bounce_scalar; //0-1, 0 means no bounce, 1 means perfectly elastic collision
-
-	private double time; //time of most recent updatePosition call
-	private double ti_x; //time of most recent x velocity reset
-	private double ti_y; //time of most recent y velocity reset
-	private double t_y_collision; //time when y-collision started, used for friction calculations
-	private double t_release; //time when released, used for calculations if the ball is dangerous
-
-	private int x_collision; // -1 means wall to left, 0 means no collision, 1 means wall to right
-	private int y_collision; // -1 means wall above, 0 means no collision, 1 means wall below
-
-	private boolean thrown = false; //balls are dangerous after a timeout after released, until stops moving
-	private double safe_timeout; //timeout after a ball is released before it becomes dangerous (more for aesthetics to reinforce the player invincibility mechanic)
-	private Optional<Player> holder;
-
-	private ArrayList<Wall> walls;
-	private ArrayList<Ball> balls;
 
 	constructor(x, y, r, color, AY)
 	{
-		this.x = x;
+		this.x = x; // (x,y) of center
 		this.y = y;
-		this.r = r;
+		this.r = r; //radius
 		this.color = color;
 
-		this.xi = x;
-		this.yi = y;
-		this.vx = 0;
+		this.xi = x; //initial x position (reset when velocity is reset)
+		this.yi = y; //initial y position (reset when velocity is reset)
+		this.vx = 0; //time of most recent y velocity reset
 		this.vy = 0;
-		this.ay = ay;
-		this.x_friction_scalar = 0.8;
-		this.x_bounce_scalar = 0.5;
+		this.AY = AY;
+		this.X_FRICTION_SCALAR = 0.8; //must be < 1. During collisions, multiply vx by this^t (t in seconds) to simulate friction
+		this.X_BOUNCE_SCALAR = 0.5; //0-1, 0 means no bounce, 1 means perfectly elastic collision
 
-		this.time = 0;
-		this.ti_x = 0;
+		this.time = 0; //time of most recent updatePosition call
+		this.ti_x = 0; //time of most recent x velocity reset
 		this.ti_y = 0;
-		this.t_y_collision = 0;
-		this.t_release = 0;
+		this.t_y_collision = 0; //time when y-collision started, used for friction calculations
+		this.t_release = 0; //time when released, used for calculations if the ball is dangerous
 
-		this.safe_timeout = 0.2;
+    this.SAFE_TIMEOUT = 0.2; //timeout after a ball is released before it becomes dangerous (more for aesthetics to reinforce the player invincibility mechanic)
 
-		this.x_collision = 0;
-		this.y_collision = 0;
+		this.x_collision = 0; // -1 means wall to left, 0 means no collision, 1 means wall to right
+		this.y_collision = 0; // -1 means wall above, 0 means no collision, 1 means wall below
 
-		this.holder = Optional.empty();
-	}
-	public void giveObjects(ArrayList<Wall> walls, ArrayList<Ball> balls)
-	{
-		this.walls = walls;
-		this.balls = balls;
+		this.holder_index = undefined; //index of the current holding player (in the game's players array), or undefined if not held
+    this.thrown = false; //balls are dangerous after a timeout after released, until stops moving
 	}
 
-	public void draw(GraphicsContext ctx)
-	{
-		ctx.setFill(color);
-		if(isDangerous()){
-			ctx.setFill(Color.BLACK);
-		}
-		ctx.fillOval(x-r, y-r, r*2, r*2);
-	}
-
+/*
 	public void updatePosition(double time)
 	{
 		this.time = time;
@@ -202,73 +162,57 @@ function getWalls(){return server.getGame().walls;}
 			}
 		}
 	}
-
-	public void setXVelocity(double vx)//time is the current time in seconds, from when the main animation timer started
+*/
+	setXVelocity(vx)//time is the current time in seconds, from when the main animation timer started
 	{
-		if(x_collision == 1 && vx > 0){return;}
-		if(x_collision == -1 && vx < 0){return;}
+		if(this.x_collision == 1 && this.vx > 0){return;}
+		if(this.x_collision == -1 && this.vx < 0){return;}
 
-		xi = x;
+		this.xi = this.x;
 		this.vx = vx;
 
-		ti_x = time;
+		this.ti_x = this.time;
 	}
 
-	public void setYVelocity(double vy)//time is the current time in seconds, from when the main animation timer started
+	setYVelocity(vy)//time is the current time in seconds, from when the main animation timer started
 	{
-		if(y_collision == 1 && vy > 0){return;}
-		if(y_collision == -1 && vy < 0){return;}
+		if(this.y_collision == 1 && this.vy > 0){return;}
+		if(this.y_collision == -1 && this.vy < 0){return;}
 
-		yi = y;
+		this.yi = this.y;
 		this.vy = vy;
 
-		ti_y = time;
+		this.ti_y = this.time;
 	}
 
-	public void pickup(Player p)
+	pickup(player)
 	{
-		holder = Optional.of(p);
+    let player_index = getPlayers().indexOf(player);
+    if(player_index < 0) throw new Error("Failed to get player index when determining ball holder, player not found in players array.");
+		this.holder_index = player_index;
 	}
-	public void release()
+	release()
 	{
-		holder = Optional.empty();
-		thrown = true;
-		t_release = time;
-	}
-
-	public void setNotDangerous() //called if a ball hits a player, to avoid multiple life-loss
-	{
-		thrown = false;
+		this.holder_index = undefined;
+		this.thrown = true;
+		this.t_release = this.time;
 	}
 
-	public double getX()
+	setNotDangerous() //called if a ball hits a player, to avoid multiple life-loss
 	{
-		return x;
+		this.thrown = false;
 	}
-	public double getY()
+
+	isDangerous()
 	{
-		return y;
+		return (this.time - this.t_release > this.SAFE_TIMEOUT) && this.thrown;
 	}
-	public double getRadius()
+	isHeld()
 	{
-		return r;
-	}
-	public boolean isDangerous()
-	{
-		if(time - t_release > safe_timeout && thrown == true)
-		{
-			return true;
-		}
-		return false;
-	}
-	public boolean isHeld()
-	{
-		return holder.isPresent();
+		return this.holder_index !== undefined;
 	}
 }
 
 
 
-
 exports.Ball = Ball;
-*/

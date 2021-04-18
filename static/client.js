@@ -74,7 +74,9 @@ function getState(){
 
 socket.on("player_connection", function(player_statuses){
 	//update player display on home screen
+	let player_display = document.getElementById("player_display");
 	player_display.innerHTML = "";
+	
 	for(let name in player_statuses){
 		if(player_statuses[name].connected){
 			let div = document.createElement("div");
