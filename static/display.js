@@ -48,18 +48,45 @@ function draw(game){
       //ctx.setEffect(null);
 
       //draw trajectory direction
-      if(p.ballIndex)
+      if(p.ball_index !== undefined)
       {
-        ctx.setStroke("gray");
-      /*  ctx.setLineDashes(p.width/5);
         let ball = game.balls[p.ball_index];
-        ctx.strokeLine(ball.x, ball.y, ball.x + p.width*Math.cos(p.shoot_angle), ball.y + p.width*Math.sin(p.shoot_angle));
-*/
+
+        ctx.strokeStyle = "gray";
+        ctx.setLineDash([p.width/5, p.width/5]);
+
+        ctx.beginPath();
+        ctx.moveTo(ball.x, ball.y);
+        ctx.lineTo(ball.x + p.width*Math.cos(p.shoot_angle), ball.y + p.width*Math.sin(p.shoot_angle));
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.setLineDash([]); //reset to no dash
+
+        //draw held ball - doing it with the player so the ball uses the same "z index" (based on array order) as the player
+        drawBall(ball, ctx);
       }
   });
 
 
-  //draw balls
+  //draw non-held balls (held balls drawn alongside players previously)
+  game.balls.forEach(b => {
+    if(b.holder_index === undefined) drawBall(b, ctx); //see below
+  });
 
+}
 
+function drawBall(b, ctx){
+  //check if ball dangerous to determine color
+  if((b.time - b.t_release > b.SAFE_TIMEOUT) && b.thrown){
+    ctx.fillStyle = b.dangerous_color;
+  }
+  else {
+    ctx.fillStyle = b.color;
+  }
+
+  ctx.beginPath();
+  ctx.arc(b.x, b.y, b.r, 0, 2*Math.PI);
+  ctx.closePath();
+  ctx.fill();
 }

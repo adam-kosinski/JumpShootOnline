@@ -12,6 +12,7 @@ class Ball
 		this.y = y;
 		this.r = r; //radius
 		this.color = color;
+		this.dangerous_color = "black";
 
 		this.xi = x; //initial x position (reset when velocity is reset)
 		this.yi = y; //initial y position (reset when velocity is reset)
@@ -36,20 +37,21 @@ class Ball
     this.thrown = false; //balls are dangerous after a timeout after released, until stops moving
 	}
 
-/*
-	public void updatePosition(double time)
+
+	updatePosition(time)
 	{
 		this.time = time;
 
 		//if this ball is held, keep pace with the player holding it
-		if(holder.isPresent())
+		if(this.holder_index !== undefined)
 		{
-			x = holder.get().getX() + (holder.get().getWidth() / 2);
-			y = holder.get().getY() + (holder.get().getHeight() * 0.65);
-			x_collision = 0;
-			y_collision = 0; //if this is not set, it can affect calculations involving friction and cause dud shots where the ball goes straight up
-			setXVelocity(0);
-			setYVelocity(0);
+			let holder = getPlayers()[this.holder_index];
+			this.x = holder.x + (holder.width / 2);
+			this.y = holder.y + (holder.height * 0.65);
+			this.x_collision = 0;
+			this.y_collision = 0; //if this is not set, it can affect calculations involving friction and cause dud shots where the ball goes straight up
+			this.setXVelocity(0);
+			this.setYVelocity(0);
 			return;
 		}
 
@@ -57,116 +59,116 @@ class Ball
 
 		// --- PRE-MOTION ACTIONS (may change initial position, velocity, or time variables) --------------------------------
 		//if velocity is in opposite direction to collision, no more collision
-		if(x_collision == 1 && vx < 0 || x_collision == -1 && vx > 0)
+		if(this.x_collision == 1 && this.vx < 0 || this.x_collision == -1 && this.vx > 0)
 		{
-			x_collision = 0;
+			this.x_collision = 0;
 		}
-		if(y_collision == 1 && vy < 0 || y_collision == -1 && vy > 0)
+		if(this.y_collision == 1 && this.vy < 0 || this.y_collision == -1 && this.vy > 0)
 		{
-			y_collision = 0;
+			this.y_collision = 0;
 		}
 
 		// --- MOTION ACTIONS (initial position, velocity, and time variables are fixed up until position calculation is done) --------------------------------
 
 		//define t to be time since most recent velocity reset
-		double t_x = time - ti_x;
-		double t_y = time - ti_y;
+		let t_x = time - this.ti_x;
+		let t_y = time - this.ti_y;
 
 		//store previous position
-		double prev_x = x;
-		double prev_y = y;
+		let prev_x = this.x;
+		let prev_y = this.y;
 
-		//move player if no collisions preventing it
-		if(x_collision == 0)
+		//move ball if no collisions preventing it
+		if(this.x_collision == 0)
 		{
-			x = xi + vx*t_x;
+			this.x = this.xi + this.vx*t_x;
 		}
 
-		if(y_collision != 1)
+		if(this.y_collision != 1)
 		{
-			y = yi + vy*t_y + 0.5*ay*t_y*t_y;
+			this.y = this.yi + this.vy*t_y + 0.5*this.AY*t_y*t_y;
 		}
 
 		//detect wall collision
-		boolean foundXCollision = false;
-		boolean foundYCollision = false;
+		let foundXCollision = false;
+		let foundYCollision = false;
 		//loop through walls
-		for(Wall w : walls)
-		{
+		getWalls().forEach(w => {
 			//y
 			//test collision below
-			if( (x+r > w.getX() && x-r < w.getX()+w.getWidth()) && (prev_y+r <= w.getY() && y+r >= w.getY()) ) //if in right x-range and collide vertically
+			if( (this.x+this.r > w.x && this.x-this.r < w.x+w.width) && (prev_y+this.r <= w.y && this.y+this.r >= w.y) ) //if in right x-range and collide vertically
 			{
 				foundYCollision = true;
-				if(y_collision == 0) //if the previous movement didn't have a y collision, this is the first y-collision
+				if(this.y_collision == 0) //if the previous movement didn't have a y collision, this is the first y-collision
 				{
-					t_y_collision = time;
+					this.t_y_collision = time;
 				}
 
-				y = w.getY() - r;
-				y_collision = 1;
-				setYVelocity(0);
+				this.y = w.y - this.r;
+				this.y_collision = 1;
+				this.setYVelocity(0);
 			}
 			//all other collision tests are dependent on if this is a border wall
-			if(w.isBorderWall())
+			if(w.border_wall)
 			{
 				//test collision above
-				if( (x+r > w.getX() && x-r < w.getX()+w.getWidth()) && (prev_y-r >= w.getY()+w.getHeight() && y-r <= w.getY()+w.getHeight()) ) //if in right x-range and collide vertically
+				if( (this.x+this.r > w.x && this.x-this.r < w.x+w.width) && (prev_y-this.r >= w.y+w.height && this.y-this.r <= w.y+w.height) ) //if in right x-range and collide vertically
 				{
 					foundYCollision = true;
-					if(y_collision == 0) //if the previous movement didn't have a y collision, this is the first y-collision
+					if(this.y_collision == 0) //if the previous movement didn't have a y collision, this is the first y-collision
 					{
-						t_y_collision = time;
+						this.t_y_collision = time;
 					}
-					y = w.getY()+w.getHeight() + r;
-					y_collision = -1;
-					setYVelocity(0);
+					this.y = w.y+w.height + this.r;
+					this.y_collision = -1;
+					this.setYVelocity(0);
 				}
 
 				//x
 				//test collision to right
-				if( (y+r > w.getY() && y-r < w.getY()+w.getHeight()) && (prev_x+r <= w.getX() && x+r >= w.getX()) ) //if in right y-range and collide horizontally
+				if( (this.y+this.r > w.y && this.y-this.r < w.y+w.height) && (prev_x+this.r <= w.x && this.x+this.r >= w.x) ) //if in right y-range and collide horizontally
 				{
 					foundXCollision = true;
 
-					x = w.getX() - r;
-					x_collision = 1;
+					this.x = w.x - this.r;
+					this.x_collision = 1;
 
-					setXVelocity(-x_bounce_scalar * vx);
+					this.setXVelocity(-this.X_BOUNCE_SCALAR * this.vx);
 				}
 				//test collision to left
-				if( (y+r > w.getY() && y-r < w.getY()+w.getHeight()) && (prev_x-r >= w.getX()+w.getWidth() && x-r <= w.getX()+w.getWidth()) ) //if in right y-range and collide horizontally
+				if( (this.y+this.r > w.y && this.y-this.r < w.y+w.height) && (prev_x-this.r >= w.x+w.width && this.x-this.r <= w.x+w.width) ) //if in right y-range and collide horizontally
 				{
 					foundXCollision = true;
 
-					x = w.getX()+w.getWidth() + r;
-					x_collision = -1;
+					this.x = w.x+w.width + this.r;
+					this.x_collision = -1;
 
-					setXVelocity(vx * -x_bounce_scalar);
+					this.setXVelocity(-this.X_BOUNCE_SCALAR * this.vx);
 				}
 			}
-		} //finish looping through walls
-		if(!foundXCollision) {x_collision = 0;}
-		if(!foundYCollision) {y_collision = 0;}
+		}); //finish looping through walls
+		if(!foundXCollision) {this.x_collision = 0;}
+		if(!foundYCollision) {this.y_collision = 0;}
 
 		//apply friction for next update call if there's a y-collision
-		if(y_collision != 0) //then we have x-friction
+		if(this.y_collision != 0) //then we have x-friction
 		{
-			double new_vx = vx * Math.pow(x_friction_scalar, time-t_y_collision); //apply friction
-			new_vx = Math.abs(new_vx) < 1 ? 0 : new_vx; //round to zero if really small x velocity
-			setXVelocity(new_vx);
+			let new_vx = this.vx * Math.pow(this.X_FRICTION_SCALAR, time-this.t_y_collision); //apply friction
+			if(Math.abs(new_vx) < 1) new_vx = 0; //round to zero if really small x velocity
+			this.setXVelocity(new_vx);
 
 			if(new_vx == 0)
 			{
-				thrown = false; //if a y-collision, and the horizontal velocity is zero, the ball stopped moving
+				this.thrown = false; //if a y-collision, and the horizontal velocity is zero, the ball stopped moving
 			}
 		}
 	}
-*/
+
+
 	setXVelocity(vx)//time is the current time in seconds, from when the main animation timer started
 	{
-		if(this.x_collision == 1 && this.vx > 0){return;}
-		if(this.x_collision == -1 && this.vx < 0){return;}
+		if(this.x_collision == 1 && vx > 0){return;}
+		if(this.x_collision == -1 && vx < 0){return;}
 
 		this.xi = this.x;
 		this.vx = vx;
@@ -176,8 +178,8 @@ class Ball
 
 	setYVelocity(vy)//time is the current time in seconds, from when the main animation timer started
 	{
-		if(this.y_collision == 1 && this.vy > 0){return;}
-		if(this.y_collision == -1 && this.vy < 0){return;}
+		if(this.y_collision == 1 && vy > 0){return;}
+		if(this.y_collision == -1 && vy < 0){return;}
 
 		this.yi = this.y;
 		this.vy = vy;

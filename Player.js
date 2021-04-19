@@ -65,7 +65,7 @@ class Player
     this.ROTATE_LEFT_KEY = "i"; //for launch angle changing
     this.ROTATE_RIGHT_KEY = "p";
     this.BALL_KEY = "o";
-    this.downKeyProcessed = false; //keeps track if we processed the first down key press, used so that we only process the first one
+    this.downKeyProcessed = false; //keeps track if we processed the first down key press, so that we don't process another one until after keyup
   }
 
 	handleKeydown(key)
@@ -100,7 +100,7 @@ class Player
 		}
 		else if(key == this.BALL_KEY)
 		{
-			if(!this.ball_index) //try to grab a ball if we don't have one
+			if(this.ball_index === undefined) //try to grab a ball if we don't have one
 			{
 				//loop through available balls
 				for(let i=0; i<getBalls().length; i++)
@@ -294,7 +294,7 @@ class Player
 
 	shootBall()
 	{
-		if(!this.ball_index){return;}
+		if(this.ball_index === undefined){return;}
 
 		let b = getBalls()[this.ball_index];
 		b.release();

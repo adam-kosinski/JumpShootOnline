@@ -1,5 +1,5 @@
 let Player = require("./Player").Player;
-//let Ball = require("./Ball").Ball;
+let Ball = require("./Ball").Ball;
 let Wall = require("./Wall").Wall;
 
 
@@ -22,7 +22,7 @@ class Game {
 
 		//update loop
 		this.t_elapsed = 0;
-		this.LOOP_FREQ = 30; //hz
+		this.LOOP_FREQ = 50; //hz
 
 		this.init();
 	}
@@ -41,11 +41,11 @@ class Game {
 		this.walls.push(new Wall(-10, -500, 10, this.FIELD_HEIGHT+500, "brown", true)); //left wall
 		this.walls.push(new Wall(this.FIELD_WIDTH, -500, 10, this.FIELD_HEIGHT+500, "brown", true)); //right wall
 
-		/*/create balls
+		//create balls
 		this.balls.push(new Ball(50, 100, 10, "blue", this.AY));
-		this.balls.push(new Ball(150, 100, 10, "blue", this.AY));
-		this.balls.push(new Ball(250, 100, 10, "blue", this.AY));
-		*/
+		//this.balls.push(new Ball(150, 100, 10, "blue", this.AY));
+		//this.balls.push(new Ball(250, 100, 10, "blue", this.AY));
+
 
 		//create players
 		this.players.push(new Player(this.player_names[0], 100, 200, 50, this.AY, "bowlinghat.png"));
