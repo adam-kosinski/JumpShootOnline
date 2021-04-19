@@ -2,6 +2,8 @@
 
 let socket = io();
 let id; //id of the socket
+let my_name;
+
 
 //CONNECTION TO SERVER -----------------------------------
 
@@ -45,12 +47,11 @@ socket.on("connect", function(){
 //check if a game is going on
 socket.emit("get_state", function(player_statuses, game){
 	if(game){
-		game_active = true;
 		console.log("game already started");
 		initCanvas(game);
 	}
 	else {
-		home_screen.style.display = "block";
+		document.getElementById("home_screen").style.display = "block";
 	}
 });
 
@@ -76,7 +77,7 @@ socket.on("player_connection", function(player_statuses){
 	//update player display on home screen
 	let player_display = document.getElementById("player_display");
 	player_display.innerHTML = "";
-	
+
 	for(let name in player_statuses){
 		if(player_statuses[name].connected){
 			let div = document.createElement("div");
@@ -92,16 +93,24 @@ socket.on("player_connection", function(player_statuses){
 
 
 socket.on("update", function(game){
+	//play chungus chuckle for each rabbit that just got hurt
+	game.players.forEach(p => {
+		if(p.time == p.t_hit){
+			let chuckle = new Audio("./static/chuckle.mp3");
+			chuckle.play();
+		}
+	});
+
 	draw(game); //display.js
 });
 
 
 socket.on("start_game", function(game){
-	home_screen.style.display = "none";
+	document.getElementById("home_screen").style.display = "none";
 	initCanvas(game); //display.js
 	console.log("starting game");
 });
 
 socket.on("clear_game", function(){
-	home_screen.style.display = "block";
+	document.getElementById("home_screen").style.display = "block";
 });

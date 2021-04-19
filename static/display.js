@@ -1,5 +1,8 @@
+let canvas = document.getElementById("canvas");
+
 let left_chungus = document.createElement("img");
 let right_chungus = document.createElement("img");
+
 
 
 
@@ -30,13 +33,21 @@ function draw(game){
   //draw players
   game.players.forEach(p => {
 
-      //TODO: red filtering
+      //red filtering if hurt
+      if(p.time - p.t_hit < p.RED_COLOR_TIMEOUT){
+        //this hacky mess makes the rabbit look red so we're going with it
+        ctx.filter = "contrast(75%) brightness(55%) sepia(100%) hue-rotate(-60deg) saturate(300%)";
+      }
 
+      //draw chungus
       let img = p.direction == "left" ? left_chungus : right_chungus; //see top of file
       if(!img.src){
         img.src = "./static/images/" + (p.direction == "left" ? p.leftChungus_src : p.rightChungus_src);
       }
       ctx.drawImage(img, p.x, p.y-0.22*p.chungus_height, p.width, p.chungus_height); //y-.25*chungus_height would place the image perfectly on the platform, but I want to draw it a bit down
+
+      //reset red filter
+      ctx.filter = "none";
 
     /*
       double hat_width = 0.45*width;
@@ -54,9 +65,9 @@ function draw(game){
 
         ctx.strokeStyle = "gray";
         ctx.lineWidth = 2;
+        ctx.setLineDash([p.width/6, p.width/10]);
 
         ctx.beginPath();
-        ctx.setLineDash([p.width/6, p.width/10]);
         ctx.moveTo(ball.x, ball.y);
         ctx.lineTo(ball.x + p.width*Math.cos(p.shoot_angle), ball.y + p.width*Math.sin(p.shoot_angle));
         ctx.stroke();

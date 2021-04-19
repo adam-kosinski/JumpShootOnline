@@ -22,7 +22,7 @@ class Game {
 
 		//update loop
 		this.t_elapsed = 0;
-		this.LOOP_FREQ = 50; //hz
+		this.LOOP_FREQ = 20; //hz
 
 		this.init();
 	}
@@ -43,8 +43,8 @@ class Game {
 
 		//create balls
 		this.balls.push(new Ball(50, 100, 10, "blue", this.AY));
-		//this.balls.push(new Ball(150, 100, 10, "blue", this.AY));
-		//this.balls.push(new Ball(250, 100, 10, "blue", this.AY));
+		this.balls.push(new Ball(150, 100, 10, "blue", this.AY));
+		this.balls.push(new Ball(250, 100, 10, "blue", this.AY));
 
 
 		//create players

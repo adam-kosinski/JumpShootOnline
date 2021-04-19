@@ -31,7 +31,7 @@ class Player
   	this.ti_x = 0; //time of most recent x velocity reset
   	this.ti_y = 0; //time of most recent y velocity reset
   	this.t_hit = -1000; //time the player most recently got hit, used for making them red when hit
-      //since a player will be red if time_now - time_hit < some number, make sure they're not red to start out by making this v. negative
+      //since a player will be red if time_now - time_hit < RED_COLOR_TIMEOUT, make sure they're not red to start out by making this very negative
 
   	this.x_collision = 0; // -1 means wall to left, 0 means no collision, 1 means wall to right
   	this.y_collision = 0; // -1 means wall above, 0 means no collision, 1 means wall below
