@@ -65,7 +65,8 @@ class Player
     this.ROTATE_LEFT_KEY = "i"; //for launch angle changing
     this.ROTATE_RIGHT_KEY = "p";
     this.BALL_KEY = "o";
-    this.downKeyProcessed = false; //keeps track if we processed the first down key press, so that we don't process another one until after keyup
+    this.down_key_processed = false; //keeps track if we processed the first down key press, so that we don't process another one until after keyup
+    this.ball_key_processed = false; //same reason as down key
   }
 
 	handleKeydown(key)
@@ -82,11 +83,9 @@ class Player
 		{
 			this.setXVelocity(this.HORIZ_SPEED);
 		}
-		else if(key == this.DOWN_KEY)
+		else if(key == this.DOWN_KEY && !this.down_key_processed) //only process down key once. This gets set to false when we release the down key
 		{
-			if(!this.downKeyProcessed) //only process down key once. This gets set to false when we release the down key
-			{
-				this.downKeyProcessed = true;
+				this.down_key_processed = true;
 				if(this.y_collision == 1 && !this.border_y_collision) //then drop through the platform
 				{
 					this.y_collision = 0;
@@ -96,10 +95,10 @@ class Player
 				{
 					this.setYVelocity(this.vy + this.AY*(this.time-this.ti_y) + this.VY_BOOST);
 				}
-			}
 		}
-		else if(key == this.BALL_KEY)
+		else if(key == this.BALL_KEY && !this.ball_key_processed) //only process ball key once. This gets set to false when we release the ball key
 		{
+      this.ball_key_processed = true;
 			if(this.ball_index === undefined) //try to grab a ball if we don't have one
 			{
 				//loop through available balls
@@ -148,8 +147,11 @@ class Player
 		}
 		if(key == this.DOWN_KEY)
 		{
-			this.downKeyProcessed = false;
+			this.down_key_processed = false;
 		}
+    if(key == this.BALL_KEY){
+      this.ball_key_processed = false;
+    }
 	}
 
 

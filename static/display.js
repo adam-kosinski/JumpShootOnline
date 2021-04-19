@@ -53,12 +53,12 @@ function draw(game){
         let ball = game.balls[p.ball_index];
 
         ctx.strokeStyle = "gray";
-        ctx.setLineDash([p.width/5, p.width/5]);
+        ctx.lineWidth = 2;
 
         ctx.beginPath();
+        ctx.setLineDash([p.width/6, p.width/10]);
         ctx.moveTo(ball.x, ball.y);
         ctx.lineTo(ball.x + p.width*Math.cos(p.shoot_angle), ball.y + p.width*Math.sin(p.shoot_angle));
-        ctx.closePath();
         ctx.stroke();
 
         ctx.setLineDash([]); //reset to no dash
