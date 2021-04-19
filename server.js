@@ -6,6 +6,7 @@ let http = require("http");
 let path = require("path");
 let socketIO = require("socket.io");
 
+
 let Game = require("./Game").Game;
 
 //app stuff
@@ -104,13 +105,18 @@ io.on("connection", function(socket) {
 
 
   socket.on("start_game", function(for_new_game=false){ //if for an immediate new game, keep same players
+    if(game !== undefined){
+      console.log("Tried to start a new game but game currently in session.");
+      return;
+    }
+
     console.log("Starting new game!");
 
     let player_names = for_new_game && game ? game.player_names : Object.keys(player_statuses);
     player_names = player_names.filter(name => player_statuses[name].connected);
     game = new Game(player_names);
 
-    //start game loop
+    //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using performance.now() for timings (see Game.update)
     game_interval = setInterval(function(){
       game.update.apply(game); //call .update() using the game as the 'this' object
       io.emit("update", game);
@@ -122,7 +128,7 @@ io.on("connection", function(socket) {
 
   socket.on("end_game", function(for_new_game=false){ //if for an immediate new game, don't need to tell the clients anything - they'll display the right thing on the next update
     console.log("Ending game");
-    if(game_interval) clearInterval(game_interval);
+    if(game_interval !== undefined) clearInterval(game_interval);
     game = undefined;
     game_interval = undefined;
 

@@ -1,6 +1,7 @@
 let Player = require("./Player").Player;
 let Ball = require("./Ball").Ball;
 let Wall = require("./Wall").Wall;
+const {performance} = require("perf_hooks");
 
 
 class Game {
@@ -21,8 +22,8 @@ class Game {
 		this.N_LIVES = 5; //number of lives each player gets
 
 		//update loop
-		this.t_elapsed = 0;
-		this.LOOP_FREQ = 20; //hz
+		this.LOOP_FREQ = 50; //hz
+		this.t_start = performance.now() / 1000;
 
 		this.init();
 	}
@@ -53,10 +54,11 @@ class Game {
 	}
 
 	update(){
+		let t_elapsed = performance.now()/1000 - this.t_start;
+
 		//update balls and players  NOTE: doing ball position before players will cause a lag in position when carrying balls... which looks cool!!!
-		this.balls.forEach(b => b.updatePosition(this.t_elapsed));
-		this.players.forEach(p => p.updatePosition(this.t_elapsed));
-		this.t_elapsed += 1/this.LOOP_FREQ;
+		this.balls.forEach(b => b.updatePosition(t_elapsed));
+		this.players.forEach(p => p.updatePosition(t_elapsed));
 	}
 }
 
