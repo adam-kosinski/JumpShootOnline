@@ -93,10 +93,6 @@ socket.on("player_connection", function(player_statuses){
 
 
 socket.on("update", function(game){
-	if(!finished_drawing){
-		document.body.style.backgroundColor = "red";
-	}
-
 	//play chungus chuckle for each rabbit that just got hurt
 	game.players.forEach(p => {
 		if(p.time == p.t_hit){

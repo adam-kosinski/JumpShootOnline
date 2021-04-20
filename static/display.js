@@ -3,8 +3,6 @@ let canvas = document.getElementById("canvas");
 let left_chungus = document.createElement("img");
 let right_chungus = document.createElement("img");
 
-let finished_drawing = true;
-
 
 
 function initCanvas(game){
@@ -21,7 +19,6 @@ function initCanvas(game){
 
 
 function draw(game){
-  finished_drawing = false;
 
   let ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -80,8 +77,6 @@ function draw(game){
         //draw held ball - doing it with the player so the ball uses the same "z index" (based on array order) as the player
         drawBall(ball, ctx);
       }
-
-      finished_drawing = true;
   });
 
 
