@@ -22,7 +22,7 @@ class Game {
 		this.N_LIVES = 5; //number of lives each player gets
 
 		//update loop
-		this.LOOP_FREQ = 50; //hz
+		this.LOOP_FREQ = 40; //hz
 		this.t_start = performance.now() / 1000;
 
 		this.init();
