@@ -136,26 +136,25 @@ io.on("connection", function(socket) {
   });
 
 
-  socket.on("keydown", function(keys_down){
+  socket.on("keydown", function(key){
     if(!game) return;
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
       if(p.name == player_name){
-        keys_down.forEach(key => p.handleKeydown(key));
+        p.handleKeydown(key);
       }
     });
     //notice that this logic essentially prevents spectators from doing anything
   });
 
-  socket.on("keyup", function(key, keys_down){ //keyup behavior can change based on other keys being down
+  socket.on("keyup", function(key){
     if(!game) return;
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
       if(p.name == player_name){
-        p.handleKeyup(key, keys_down);
-        keys_down.forEach(key => p.handleKeydown(key)); //e.g. if we were pressing left and right and moving right, then let go of right - expect to move left, a keydown action
+        p.handleKeyup(key);
       }
     });
   });

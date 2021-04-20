@@ -67,23 +67,19 @@ class Player
     this.BALL_KEY = "o";
     this.down_key_processed = false; //keeps track if we processed the first down key press, so that we don't process another one until after keyup
     this.ball_key_processed = false; //same reason as down key
+    this.keys_down = []; //list of keys currently down, to continually process (since interactions of multiple keys mean a key held down from a long time ago might not still be sending rapid events)
+      //key down an key up handling will maintain this list to be accurate
   }
 
 	handleKeydown(key)
 	{
-		if(key == this.JUMP_KEY && this.y_collision == 1) //can only jump if on a platform
-		{
-			this.setYVelocity(-this.JUMP_SPEED);
-		}
-		else if(key == this.LEFT_KEY)
-		{
-			this.setXVelocity(-this.HORIZ_SPEED);
-		}
-		else if(key == this.RIGHT_KEY)
-		{
-			this.setXVelocity(this.HORIZ_SPEED);
-		}
-		else if(key == this.DOWN_KEY && !this.down_key_processed) //only process down key once. This gets set to false when we release the down key
+    //maintain this.keys_down
+    if(!this.keys_down.includes(key)) this.keys_down.push(key);
+
+    //process keys we only expect behavior from on the instant of keydown/up
+    //keys we expect behavior from the duration of being pressed are processed in this.processContinuousKeys()
+
+		if(key == this.DOWN_KEY && !this.down_key_processed) //only process down key once. This gets set to false when we release the down key
 		{
 				this.down_key_processed = true;
 				if(this.y_collision == 1 && !this.border_y_collision) //then drop through the platform
@@ -121,27 +117,32 @@ class Player
 				this.shootBall();
 			}
 		}
-		else if(key == this.ROTATE_LEFT_KEY)
-		{
-			if(this.shoot_angle_index < this.shoot_angle_array.length - 1)
-			{
-				this.shoot_angle_index++;
-				this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index];
-			}
-		}
-		else if(key == this.ROTATE_RIGHT_KEY)
-		{
-			if(this.shoot_angle_index > 0)
-			{
-				this.shoot_angle_index--;
-				this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index];
-			}
-		}
+    else if(key == this.ROTATE_LEFT_KEY)
+    {
+      if(this.shoot_angle_index < this.shoot_angle_array.length - 1)
+      {
+        this.shoot_angle_index++;
+        this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index];
+      }
+    }
+    else if(key == this.ROTATE_RIGHT_KEY)
+    {
+      if(this.shoot_angle_index > 0)
+      {
+        this.shoot_angle_index--;
+        this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index];
+      }
+    }
 	}
 
-	handleKeyup(key, keys_down)
+	handleKeyup(key)
 	{
-		if(!keys_down.includes(this.LEFT_KEY) && !keys_down.includes(this.RIGHT_KEY))
+    //maintain this.keys_down
+    let idx = this.keys_down.indexOf(key);
+    if(idx != -1) this.keys_down.splice(idx, 1);
+
+
+		if(!this.keys_down.includes(this.LEFT_KEY) && !this.keys_down.includes(this.RIGHT_KEY))
 		{
 			this.setXVelocity(0); //since y velocity is governed by gravity, not resetting like with x velocity
 		}
@@ -153,6 +154,32 @@ class Player
       this.ball_key_processed = false;
     }
 	}
+
+
+  processContinuousKeys(){
+    //continuously process keys currently down regardless of if we're getting events from the client
+    //this is called every frame from updatePosition()
+    //keys processed here are thos we expect behavior from for the duration of being pressed (as opposed to just the instant of keydown/keyup)
+    //actions only on the instant of keyup/keydown are processed in handleKeydown/up
+
+    this.keys_down.forEach(key => {
+
+      if(key == this.JUMP_KEY && this.y_collision == 1) //can only jump if on a platform
+  		{
+  			this.setYVelocity(-this.JUMP_SPEED);
+  		}
+  		else if(key == this.LEFT_KEY)
+  		{
+  			this.setXVelocity(-this.HORIZ_SPEED);
+  		}
+  		else if(key == this.RIGHT_KEY)
+  		{
+  			this.setXVelocity(this.HORIZ_SPEED);
+  		}
+    });
+
+
+  }
 
 
 	//function to update player's position
@@ -262,11 +289,11 @@ class Player
 				this.health = Math.max(this.health - 1, 0);
 				b.setNotDangerous();
 				this.t_hit = time;
-
-				//play chungus chuckle sound
-				// TODO
 			}
 		});
+
+
+    this.processContinuousKeys();
 	}
 
 	setXVelocity(vx)//time is the current time in seconds, from when the main animation timer started

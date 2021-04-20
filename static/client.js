@@ -93,6 +93,10 @@ socket.on("player_connection", function(player_statuses){
 
 
 socket.on("update", function(game){
+	if(game.players[0].y_collision === 1){
+		//console.log("y");
+	}
+
 	//play chungus chuckle for each rabbit that just got hurt
 	game.players.forEach(p => {
 		if(p.time == p.t_hit){
