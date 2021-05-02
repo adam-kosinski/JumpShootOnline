@@ -30,7 +30,7 @@ function initHealthBars(game){
     container.appendChild(health_bar);
 
     let hat_img = document.createElement("img");
-    hat_img.src = "./static/images/" + p.hat_src;
+    hat_img.src = "./static/images/" + p.hat_name + "_left.png";
     health_bar.appendChild(hat_img);
 
     let hearts = document.createElement("div");
@@ -99,11 +99,13 @@ function draw(game){
 
       //draw hat
       let hat_img = document.createElement("img");
-      hat_img.src = "./static/images/" + p.hat_src;
+      hat_img.src = "./static/images/" + p.hat_name + "_" + p.direction + ".png";
       let hat_width = 0.45*p.width;
+      if(p.hat_name == "sombrero") hat_width = 0.6*p.width; //hehe
       let hat_height = hat_width / p.hat_aspect_ratio;
       let hat_x = p.x + (p.direction=="right"? (p.width-hat_width)*0.6 : (p.width-hat_width)*0.4);
-      ctx.drawImage(hat_img, hat_x-x_offset, p.y-y_offset, hat_width, hat_height);
+      let hat_y_offset = 0.75*(hat_height-12);
+      ctx.drawImage(hat_img, hat_x-x_offset, p.y-y_offset-hat_y_offset, hat_width, hat_height);
 
 
       //draw trajectory direction

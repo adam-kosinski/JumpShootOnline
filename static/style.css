@@ -1,9 +1,11 @@
 /* z-index table
-
+#load_screen: 10
+#home_screen: 5
 */
 
 
 html, body {
+	margin: 0;
 	position: relative;
 }
 
@@ -25,6 +27,7 @@ button {
 	height: 100vh;
 	background-color: black;
 	position: fixed;
+	z-index: 10;
 }
 
 /* home screen ----------------------------------------------------*/
@@ -34,6 +37,7 @@ button {
 	height: 100vh;
 	background-color: lightblue;
 	position: fixed;
+	z-index: 5;
 }
 
 #home_screen * {
@@ -76,12 +80,15 @@ button {
 /* game ------------------------------------------------------*/
 
 #canvas {
+	margin-top: 8px;
+	margin-left: 8px;
 	border: 1px solid black;
 	position: static;
 	display: inline-block;
 }
 
 #health_bars {
+	margin-top: 8px;
 	display: inline-block;
 	vertical-align: top;
 	position: relative;
@@ -100,6 +107,7 @@ button {
 .health_bar img {
 	height: 40px;
 	display: block;
+	margin: auto;
 }
 
 .health_bar :first-child {
@@ -107,7 +115,6 @@ button {
 }
 
 .health_bar img.heart {
-	margin: auto;
 	margin-top: 10px;
 }
 

@@ -5,7 +5,7 @@ function getWalls(){return server.getGame().walls;}
 class Player
 {
 
-  constructor(name, x, y, width, AY, n_lives, hat_src, hat_aspect_ratio){
+  constructor(name, x, y, width, AY, n_lives, hat_name, hat_aspect_ratio){
     //x, y is initial position
     //width determines size of chungus
     //AY is gravitational acceleration
@@ -38,7 +38,7 @@ class Player
   	this.y_collision = 0; // -1 means wall above, 0 means no collision, 1 means wall below
   	this.border_y_collision = false; //set to true if the y_collision is with a border wall
 
-  	this.hat_src = hat_src;
+  	this.hat_name = hat_name;
     this.hat_aspect_ratio = hat_aspect_ratio; // width / height
   	this.rightChungus_src = "rightChungus.png";
   	this.leftChungus_src = "leftChungus.png";

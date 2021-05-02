@@ -7,7 +7,6 @@ const {performance} = require("perf_hooks");
 class Game {
 	constructor(player_names){
 		this.player_names = player_names; //should be an array of two names
-		if(player_names.length != 2){throw new Error("Not two players");} //TODO: support an arbitrary number of players
 
 		this.players = [];
 		this.walls = [];
@@ -20,6 +19,10 @@ class Game {
 		//misc
 		this.AY = 550; //gravitational acceleration, px/s^2
 		this.N_LIVES = 5; //number of lives each player gets
+		this.n_balls_array = [3, 3, 4, 5]; //n balls in play for each player count (1,2,3,4), use the last one for larger player counts than 4
+		this.hat_name_array = ["bowlinghat", "cowboyhat", "sombrero", "fedora"]; //when creating new players, loop through this to get hat, restart at beginning if run out
+		this.hat_aspect_ratios = [346/194, 190/99, 168/129, 200/137];
+			//note: hats required to be .png b/c of how display.js figures out the image src
 
 		//update loop
 		this.LOOP_FREQ = 40; //hz
@@ -43,14 +46,27 @@ class Game {
 		this.walls.push(new Wall(this.FIELD_WIDTH, -500, 10, this.FIELD_HEIGHT+500, "brown", true)); //right wall
 
 		//create balls
-		this.balls.push(new Ball(50, 100, 10, "blue", this.AY));
-		this.balls.push(new Ball(150, 100, 10, "blue", this.AY));
-		this.balls.push(new Ball(250, 100, 10, "blue", this.AY));
+		let b_arr = this.n_balls_array;
+		let n_balls = this.player_names.length > b_arr.length ? b_arr[b_arr.length-1] : b_arr[this.player_names.length-1];
+		for(let i=0; i<n_balls; i++){
+			let x = 50 + Math.random()*(this.FIELD_WIDTH-100);
+			let y = 50 + Math.random()*(this.FIELD_HEIGHT-100);
+			this.balls.push(new Ball(x, y, 10, "blue", this.AY));
+		}
 
 
-		//create players - name, x, y, width, AY, n_lives, hat_src, hat_aspect_ratio
-		this.players.push(new Player(this.player_names[0], 100, 200, 50, this.AY, this.N_LIVES, "bowlinghat.png", 346/194));
-		this.players.push(new Player(this.player_names[1], 200, 200, 50, this.AY, this.N_LIVES, "cowboyhat.png", 190/99));
+		//create players - name, x, y, width, AY, n_lives, hat_name, hat_aspect_ratio
+		for(let i=0; i<this.player_names.length; i++){
+			let name = this.player_names[i];
+			let x = 100 + Math.random()*(this.FIELD_WIDTH-200);
+			let y = 100 + Math.random()*(this.FIELD_HEIGHT-200);
+			let width = 50;
+			let ay = this.AY;
+			let n_lives = this.N_LIVES;
+			let hat_name = this.hat_name_array[i % this.hat_name_array.length];
+			let hat_aspect_ratio = this.hat_aspect_ratios[i % this.hat_aspect_ratios.length];
+			this.players.push(new Player(name, x, y, width, ay, n_lives, hat_name, hat_aspect_ratio));
+		}
 	}
 
 	update(){
