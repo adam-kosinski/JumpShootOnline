@@ -110,7 +110,7 @@ button {
 	margin: auto;
 }
 
-.health_bar :first-child {
+.health_bar .hat_display {
 	margin-bottom: 20px;
 }
 

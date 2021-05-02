@@ -31,6 +31,7 @@ function initHealthBars(game){
 
     let hat_img = document.createElement("img");
     hat_img.src = "./static/images/" + p.hat_name + "_left.png";
+    hat_img.className = "hat_display";
     health_bar.appendChild(hat_img);
 
     let hearts = document.createElement("div");
