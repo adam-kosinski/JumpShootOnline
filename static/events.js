@@ -23,10 +23,18 @@ function startGame(){
 }
 
 function newGame(){
-  socket.emit("end_game", true); //true for immediate new game
-  socket.emit("start_game", true); //same thing
+  //prevent spectators from doing this
+  socket.emit("get_state", function(player_statuses, game){
+    if(!game.player_names.includes(my_name)) return;
+    socket.emit("end_game", true); //true for immediate new game
+    socket.emit("start_game", true); //same thing
+  });
 }
 
 function clearGame(){
-  socket.emit("end_game");
+  //prevent spectators from doing this
+  socket.emit("get_state", function(player_statuses, game){
+    if(!game.player_names.includes(my_name)) return;
+    socket.emit("end_game");
+  });
 }

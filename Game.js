@@ -48,9 +48,9 @@ class Game {
 		this.balls.push(new Ball(250, 100, 10, "blue", this.AY));
 
 
-		//create players
-		this.players.push(new Player(this.player_names[0], 100, 200, 50, this.AY, "bowlinghat.png"));
-		this.players.push(new Player(this.player_names[1], 200, 200, 50, this.AY, "cowboyhat.png"));
+		//create players - name, x, y, width, AY, n_lives, hat_src, hat_aspect_ratio
+		this.players.push(new Player(this.player_names[0], 100, 200, 50, this.AY, this.N_LIVES, "bowlinghat.png", 346/194));
+		this.players.push(new Player(this.player_names[1], 200, 200, 50, this.AY, this.N_LIVES, "cowboyhat.png", 190/99));
 	}
 
 	update(){

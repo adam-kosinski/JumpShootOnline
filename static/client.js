@@ -5,6 +5,7 @@ let id; //id of the socket
 let my_name;
 
 
+
 //CONNECTION TO SERVER -----------------------------------
 
 //send a new player message to the server, and pick name
@@ -24,7 +25,11 @@ function registerName(){
 	socket.emit("new player", my_name, function(success){
 		console.log("Name registration success:",success);
 		if(success || success === null) document.getElementById("load_screen").style.display = "none";
-		if(success === null) alert("You are viewing an ongoing game as a spectator. Once the game is cleared you will be able to join as a player.")
+		if(success === null){
+			alert("You are viewing an ongoing game as a spectator. Once the game is cleared reload the page to join as a player.");
+			document.getElementById("new_game_button").style.display = "none";
+			document.getElementById("clear_game_button").style.display = "none";
+		}
 
 		if(success === false){
 			alert("'"+my_name+"' is taken. Please choose another");
@@ -49,6 +54,7 @@ socket.emit("get_state", function(player_statuses, game){
 	if(game){
 		console.log("game already started");
 		initCanvas(game);
+		initHealthBars(game);
 	}
 	else {
 		document.getElementById("home_screen").style.display = "block";
@@ -97,13 +103,19 @@ socket.on("update", function(game){
 		//console.log("y");
 	}
 
-	//play chungus chuckle for each rabbit that just got hurt
-	game.players.forEach(p => {
+	//play chungus chuckle for each rabbit that just got hurt and update health display
+	for(let i=0; i<game.players.length; i++){
+		let p = game.players[i];
 		if(p.time == p.t_hit){
 			let chuckle = new Audio("./static/chuckle.mp3");
 			chuckle.play();
+
+			let hearts_div = document.getElementById("player" + i + "_hearts");
+			if(hearts_div.lastElementChild){
+				hearts_div.removeChild(hearts_div.lastElementChild);
+			}
 		}
-	});
+	};
 
 	draw(game); //display.js
 });
@@ -112,6 +124,7 @@ socket.on("update", function(game){
 socket.on("start_game", function(game){
 	document.getElementById("home_screen").style.display = "none";
 	initCanvas(game); //display.js
+	initHealthBars(game); //display.js
 	console.log("starting game");
 });
 

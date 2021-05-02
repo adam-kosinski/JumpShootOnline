@@ -4,12 +4,10 @@
 
 
 html, body {
-	margin: 0;
 	position: relative;
 }
 
 body * {
-	position: absolute;
 	font-family: sans-serif;
 	user-select: none;
 }
@@ -43,6 +41,7 @@ button {
 	right: 0;
 	margin: auto;
 	text-align: center;
+	position: absolute;
 }
 
 #home_screen h1 {
@@ -79,11 +78,40 @@ button {
 #canvas {
 	border: 1px solid black;
 	position: static;
+	display: inline-block;
+}
+
+#health_bars {
+	display: inline-block;
+	vertical-align: top;
+	position: relative;
+}
+
+.health_bar {
+	border: 5px solid gold;
+	background-color: orange;
+	width: 75px;
+	padding: 10px;
+	display: inline-block;
+	vertical-align: top;
+	margin: 3px;
+}
+
+.health_bar img {
+	height: 40px;
 	display: block;
 }
 
+.health_bar :first-child {
+	margin-bottom: 20px;
+}
+
+.health_bar img.heart {
+	margin: auto;
+	margin-top: 10px;
+}
+
 #new_game_button, #clear_game_button {
-	position: static;
 	display: inline-block;
 	margin: 5px;
 }
