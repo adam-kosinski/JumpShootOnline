@@ -109,9 +109,6 @@ socket.on("player_connection", function(player_statuses){
 
 
 socket.on("update", function(game){
-	if(game.players[0].y_collision === 1){
-		//console.log("y");
-	}
 
 	//play chungus chuckle for each rabbit that just got hurt and update health display
 	for(let i=0; i<game.players.length; i++){
