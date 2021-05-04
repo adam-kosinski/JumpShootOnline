@@ -6,7 +6,7 @@ const {performance} = require("perf_hooks");
 
 class Game {
 	constructor(player_names){
-		this.player_names = player_names; //should be an array of two names
+		this.player_names = player_names; //array of strings
 
 		this.players = [];
 		this.walls = [];

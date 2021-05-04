@@ -1,7 +1,18 @@
 let canvas = document.getElementById("canvas");
 
+//load chungus imagaes ahead of time so no blip the first time we change directions
 let left_chungus = document.createElement("img");
+left_chungus.src = "./static/images/leftChungus.png";
 let right_chungus = document.createElement("img");
+right_chungus.src = "./static/images/rightChungus.png";
+
+
+
+function initGameDisplay(game){
+  initCanvas(game);
+  initHealthBars(game);
+  filterDisplayIfSpectator();
+}
 
 
 
@@ -35,7 +46,7 @@ function initHealthBars(game){
     health_bar.appendChild(hat_img);
 
     let hearts = document.createElement("div");
-    hearts.id = "player" + i + "_hearts";
+    hearts.id = "player" + i + "_hearts"; //this id is how we remove hearts from the display during the game - see client.js
     health_bar.appendChild(hearts);
 
     for(let h=0; h<p.health; h++){
@@ -45,6 +56,13 @@ function initHealthBars(game){
       hearts.appendChild(heart_img);
     }
   }
+}
+
+
+
+function filterDisplayIfSpectator(){
+  document.getElementById("new_game_button").style.display = am_spectator ? "none" : "inline-block";
+  document.getElementById("clear_game_button").style.display = am_spectator ? "none" : "inline-block";
 }
 
 
@@ -82,7 +100,7 @@ function draw(game){
 
       //apply rotation/translation to accomodate death animation
       ctx.translate(x_offset, y_offset);
-      if(p.health <= 0 && p.t_died !== undefined && p.death_ball_vx !== undefined){
+      if(p.health <= 0 && p.t_died != undefined && p.death_ball_vx != undefined){
         let rotation_angle = Math.min(3*(p.time-p.t_died), Math.PI/2);
         rotation_angle *= Math.sign(p.death_ball_vx);
         ctx.rotate(rotation_angle);
@@ -91,9 +109,6 @@ function draw(game){
 
       //draw chungus
       let img = p.direction == "left" ? left_chungus : right_chungus; //see top of file
-      if(!img.src){
-        img.src = "./static/images/" + (p.direction == "left" ? p.leftChungus_src : p.rightChungus_src);
-      }
       ctx.drawImage(img, p.x-x_offset, p.y-y_offset-0.22*p.chungus_height, p.width, p.chungus_height); //y-.25*chungus_height would place the image perfectly on the platform, but I want to draw it a bit down
       //note: drawing at (-r_x_center, -r_y_center etc) b/c we translated the canvas ctx
 

@@ -3,14 +3,16 @@
 let socket = io();
 let id; //id of the socket
 let my_name;
+let am_spectator;
 
-
+//preload the chuckle
+let chuckle = new Audio("./static/chuckle.mp3");
 
 //CONNECTION TO SERVER -----------------------------------
 
 //send a new player message to the server, and pick name
 function registerName(){
-	my_name = prompt("Please enter a name (< 11 characters or display problems happen):"); //TODO: make this a GUI thing not a prompt
+	my_name = prompt("Please enter a name (if reconnecting must match previous name):"); //TODO: make this a GUI thing not a prompt
 
 	//filter out no name or canceling the popup
 	if(my_name===""){
@@ -18,23 +20,32 @@ function registerName(){
 		return;
 	}
 	if(!my_name){
-		throw new Error("Name entry canceled, leaving webpage blank");
+		socket.disconnect();
+		throw new Error("Name entry canceled, disconnecting client and leaving webpage blank"); //TODO can they still send stuff to the server and crash it b/c it can't find me in player_statuses?
 	}
 
 	//check name
-	socket.emit("new player", my_name, function(success){
-		console.log("Name registration success:",success);
-		if(success || success === null) document.getElementById("load_screen").style.display = "none";
-		if(success === null){
-			alert("You are viewing an ongoing game as a spectator. Once the game is cleared reload the page to join as a player.");
-			document.getElementById("new_game_button").style.display = "none";
-			document.getElementById("clear_game_button").style.display = "none";
-		}
+	socket.emit("new player", my_name, function(name_info_string){
+		console.log("Name registration, server returned:", name_info_string);
 
-		if(success === false){
+		if(name_info_string == "duplicate"){
+			//invalid connection, try again
 			alert("'"+my_name+"' is taken. Please choose another");
 			my_name = undefined;
 			registerName();
+			return;
+		}
+
+		//we have a valid connection
+
+		document.getElementById("load_screen").style.display = "none"; //get rid of black div covering the page
+
+		if(name_info_string == "spectator"){
+			alert("You are viewing an ongoing game as a spectator.");
+			am_spectator = true;
+		}
+		else {
+			am_spectator = false;
 		}
 	});
 }
@@ -53,8 +64,7 @@ socket.on("connect", function(){
 socket.emit("get_state", function(player_statuses, game){
 	if(game){
 		console.log("game already started");
-		initCanvas(game);
-		initHealthBars(game);
+		initGameDisplay(game); //display.js
 	}
 	else {
 		document.getElementById("home_screen").style.display = "block";
@@ -107,8 +117,7 @@ socket.on("update", function(game){
 	for(let i=0; i<game.players.length; i++){
 		let p = game.players[i];
 		if(p.time == p.t_hit){
-			let chuckle = new Audio("./static/chuckle.mp3");
-			chuckle.play();
+			chuckle.play(); //loaded at the top of this file
 
 			let hearts_div = document.getElementById("player" + i + "_hearts");
 			if(hearts_div.lastElementChild){
@@ -123,11 +132,11 @@ socket.on("update", function(game){
 
 socket.on("start_game", function(game){
 	document.getElementById("home_screen").style.display = "none";
-	initCanvas(game); //display.js
-	initHealthBars(game); //display.js
+	initGameDisplay(game); //display.js
 	console.log("starting game");
 });
 
 socket.on("clear_game", function(){
 	document.getElementById("home_screen").style.display = "block";
+	am_spectator = false;
 });

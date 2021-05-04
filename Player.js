@@ -40,8 +40,6 @@ class Player
 
   	this.hat_name = hat_name;
     this.hat_aspect_ratio = hat_aspect_ratio; // width / height
-  	this.rightChungus_src = "rightChungus.png";
-  	this.leftChungus_src = "leftChungus.png";
   	this.width = width; //width of hitbox and of chungus image
   	this.chungus_height = (this.width/1442) * 2618; //image width is 1442, height 2618
   	this.height = 0.75 * this.chungus_height; //height of hitbox
