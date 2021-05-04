@@ -56,11 +56,8 @@ io.on("connection", function(socket) {
   // PLAYER CONNECTIONS ----------------------------------------------
 
 
-	//when a new player joins, check if player exists. If they don't, create new player. If they do, only allow join if that player was disconnected
 	socket.on("new player", function(name, callback){
     //return: "success" or "duplicate" or "spectator"
-
-    console.log("received: new player")
 
     /* LOGIC:
     Check if player name exists in our register of player_statuses
@@ -105,9 +102,6 @@ io.on("connection", function(socket) {
 
 	//mark player as disconnected when they leave
 	socket.on("disconnect", function(){
-
-    console.log("received: disconnect")
-
 		if(id_to_name.hasOwnProperty(socket.id)){
 			console.log(id_to_name[socket.id]+" disconnected (id: " + socket.id + ")");
 
@@ -120,7 +114,6 @@ io.on("connection", function(socket) {
 	});
 
 	socket.on("get_state", function(callback){
-    console.log("received: get_state");
 		callback(player_statuses, game); //if game is undefined, tells them no game currently happening
 	});
 
@@ -128,8 +121,6 @@ io.on("connection", function(socket) {
 
 
   socket.on("start_game", function(for_new_game=false){ //if for an immediate new game, keep same players
-
-    console.log("received: start_game");
 
     console.log("Starting new game! - for_new_game: " + for_new_game);
 
@@ -148,8 +139,6 @@ io.on("connection", function(socket) {
 
 
   socket.on("end_game", function(for_new_game=false){
-    console.log("received: end_game");
-
     console.log("Ending game");
     if(game_interval !== undefined) clearInterval(game_interval);
     game_interval = undefined;
@@ -162,9 +151,6 @@ io.on("connection", function(socket) {
 
 
   socket.on("keydown", function(key){
-
-    console.log("received: keydown");
-
     if(!game) return;
 
     let player_name = id_to_name[socket.id];
@@ -177,8 +163,6 @@ io.on("connection", function(socket) {
   });
 
   socket.on("keyup", function(key){
-    console.log("received: keyup");
-
     if(!game) return;
 
     let player_name = id_to_name[socket.id];

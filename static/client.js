@@ -21,7 +21,7 @@ function registerName(){
 	}
 	if(!my_name){
 		socket.disconnect();
-		throw new Error("Name entry canceled, disconnecting client and leaving webpage blank"); //TODO can they still send stuff to the server and crash it b/c it can't find me in player_statuses?
+		throw new Error("Name entry canceled, disconnecting client and leaving webpage blank");
 	}
 
 	//check name

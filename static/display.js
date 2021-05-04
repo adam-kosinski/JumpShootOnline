@@ -1,4 +1,7 @@
 let canvas = document.getElementById("canvas");
+let resolution_scale_factor = Math.max(1, window.innerHeight / 600); //600 is the current game field height - scale to support approximately as many pixels as can fit on the screen, but never scale down
+  //canvas style size always equals Game.FIELD_WIDTH and Game.FIELD_HEIGHT, but to accomodate higher resolution,
+  //the amount of pixels the canvas renders is scaled by this amount
 
 //load chungus imagaes ahead of time so no blip the first time we change directions
 let left_chungus = document.createElement("img");
@@ -20,8 +23,8 @@ function initCanvas(game){
   console.log("initting canvas");
   let width = game.FIELD_WIDTH;
   let height = game.FIELD_HEIGHT;
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = resolution_scale_factor*width; //see top of file
+  canvas.height = resolution_scale_factor*height;
   canvas.style.width = width + "px";
   canvas.style.height = height + "px";
 }
@@ -73,6 +76,9 @@ function draw(game){
 
   let ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.scale(resolution_scale_factor, resolution_scale_factor); //see top of file
 
   //draw walls
   game.walls.forEach(w => {
@@ -155,6 +161,8 @@ function draw(game){
     if(b.holder_index === undefined) drawBall(b, ctx); //see below
   });
 
+  //reset ctx scale
+  ctx.restore();
 }
 
 function drawBall(b, ctx, x_offset=0, y_offset=0){

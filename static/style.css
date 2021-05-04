@@ -35,7 +35,7 @@ button {
 	display: none;
 	width: 100vw;
 	height: 100vh;
-	background-color: lightblue;
+	background-color: navajowhite;
 	position: fixed;
 	z-index: 5;
 }
@@ -49,7 +49,12 @@ button {
 }
 
 #home_screen h1 {
-	top: 10px;
+	top: 3vh;
+}
+
+#home_screen_image {
+	height: 40vh;
+	top: 10vh;
 }
 
 #player_display {
