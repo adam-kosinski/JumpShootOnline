@@ -28,8 +28,6 @@ class Ball
 		this.t_y_collision = 0; //time when y-collision started, used for friction calculations
 		this.t_release = 0; //time when released, used for calculations if the ball is dangerous
 
-    this.SAFE_TIMEOUT = 0.2; //timeout after a ball is released before it becomes dangerous (more for aesthetics to reinforce the player invincibility mechanic)
-
 		this.x_collision = 0; // -1 means wall to left, 0 means no collision, 1 means wall to right
 		this.y_collision = 0; // -1 means wall above, 0 means no collision, 1 means wall below
 
@@ -207,7 +205,8 @@ class Ball
 
 	isDangerous()
 	{
-		return (this.time - this.t_release > this.SAFE_TIMEOUT) && this.thrown;
+		return this.thrown; //used to have a timeout but was made redundant by player invincibility
+		//also best to not have a timeout for dangerous to prevent players staying on top of each other to be safe
 	}
 	isHeld()
 	{

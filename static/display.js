@@ -167,7 +167,7 @@ function draw(game){
 
 function drawBall(b, ctx, x_offset=0, y_offset=0){
   //check if ball dangerous to determine color
-  if((b.time - b.t_release > b.SAFE_TIMEOUT) && b.thrown){
+  if(b.thrown){
     ctx.fillStyle = b.dangerous_color;
   }
   else {
