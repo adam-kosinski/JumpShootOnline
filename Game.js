@@ -20,8 +20,8 @@ class Game {
 		this.AY = 550; //gravitational acceleration, px/s^2
 		this.N_LIVES = 5; //number of lives each player gets
 		this.n_balls_array = [3, 3, 4, 5]; //n balls in play for each player count (1,2,3,4), use the last one for larger player counts than 4
-		this.hat_name_array = ["bowlinghat", "cowboyhat", "sombrero", "fedora"]; //when creating new players, loop through this to get hat, restart at beginning if run out
-		this.hat_aspect_ratios = [346/194, 190/99, 168/129, 200/137];
+		this.hat_name_array = ["bowlinghat", "sombrero", "fedora", "cowboyhat"]; //when creating new players, loop through this to get hat, restart at beginning if run out
+		this.hat_aspect_ratios = [346/194, 168/129, 200/137, 190/99];
 			//note: hats required to be .png b/c of how display.js figures out the image src
 
 		//update loop
