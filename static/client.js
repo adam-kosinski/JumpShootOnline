@@ -60,6 +60,15 @@ socket.on("connect", function(){
 });
 
 
+//if disconnect, don't try to reconnect - that would mess up the id_to_name database in the server
+//we could connect back with the same name using some hack... but just ask user to reload
+socket.on("disconnect", function(){
+	console.warn("disconnect detected, preventing reconnection attempts");
+	socket.disconnect();
+	alert("You have disconnected from the server. If the server is up, reloading the page will reconnect you.");
+});
+
+
 //check if a game is going on
 socket.emit("get_state", function(player_statuses, game){
 	if(game){
