@@ -133,7 +133,7 @@ io.on("connection", function(socket) {
       const now = performance.now();
       game.update(now);
       io.emit("update", game, now);
-    }, 1000 / 40);  // 1000ms divided by loop freq in hz
+    }, 1000 / 10);  // 1000ms divided by loop freq in hz
 
     io.emit("start_game", game); //let everyone know
   });
@@ -151,10 +151,12 @@ io.on("connection", function(socket) {
   });
 
 
+  const FAKE_LATENCY = 0;
+
   socket.on("keydown", async function(key){
     if(!game) return;
 
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
@@ -168,7 +170,7 @@ io.on("connection", function(socket) {
   socket.on("keyup", async function(key){
     if(!game) return;
 
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {

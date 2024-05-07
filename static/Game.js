@@ -68,9 +68,8 @@ export class Game {
 	}
 
 
-	update(time_now){
+	update(time_now){ // time_now is an argument, because we can't just use performance.now() in this function - that differs for server vs. clients
 		let t_elapsed = time_now/1000 - this.t_start;
-		console.log(t_elapsed)
 
 		//update balls and players  NOTE: doing ball position before players will cause a lag in position when carrying balls... which looks cool!!!
 		this.balls.forEach(b => b.updatePosition(this, t_elapsed));
