@@ -11,10 +11,13 @@ right_chungus.src = "./static/images/rightChungus.png";
 
 
 
-function initGameDisplay(game){
+function initGameDisplay(game, am_spectator){
   initCanvas(game);
   initHealthBars(game);
-  filterDisplayIfSpectator();
+
+  // filter display based on if I am a spectator
+  document.getElementById("new_game_button").style.display = am_spectator ? "none" : "inline-block";
+  document.getElementById("clear_game_button").style.display = am_spectator ? "none" : "inline-block";
 }
 
 
@@ -59,13 +62,6 @@ function initHealthBars(game){
       hearts.appendChild(heart_img);
     }
   }
-}
-
-
-
-function filterDisplayIfSpectator(){
-  document.getElementById("new_game_button").style.display = am_spectator ? "none" : "inline-block";
-  document.getElementById("clear_game_button").style.display = am_spectator ? "none" : "inline-block";
 }
 
 

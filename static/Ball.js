@@ -1,11 +1,7 @@
-let server = require("./server");
-function getWalls() { return server.getGame().walls; }
-function getPlayers() { return server.getGame().players; }
-
-
-class Ball {
+export class Ball {
 
 	constructor(x, y, r, color, AY) {
+
 		this.x = x; // (x,y) of center
 		this.y = y;
 		this.r = r; //radius
@@ -34,12 +30,12 @@ class Ball {
 	}
 
 
-	updatePosition(time) {
+	updatePosition(game, time) {
 		this.time = time;
 
 		//if this ball is held, keep pace with the player holding it
 		if (this.holder_index !== undefined) {
-			let holder = getPlayers()[this.holder_index];
+			let holder = game.players[this.holder_index];
 			this.x = holder.x + (holder.width / 2);
 			this.y = holder.y + (holder.height * 0.65);
 			this.x_collision = 0;
@@ -83,7 +79,7 @@ class Ball {
 		let foundXCollision = false;
 		let foundYCollision = false;
 		//loop through walls
-		getWalls().forEach(w => {
+		game.walls.forEach(w => {
 			//y
 			//test collision below
 			if ((this.x + this.r > w.x && this.x - this.r < w.x + w.width) && (prev_y + this.r <= w.y && this.y + this.r >= w.y)) //if in right x-range and collide vertically
@@ -175,9 +171,7 @@ class Ball {
 		this.ti_y = this.time;
 	}
 
-	pickup(player) {
-		let player_index = getPlayers().indexOf(player);
-		if (player_index < 0) throw new Error("Failed to get player index when determining ball holder, player not found in players array.");
+	pickup(player_index) {
 		this.holder_index = player_index;
 	}
 	release() {
@@ -199,7 +193,3 @@ class Ball {
 		return this.holder_index !== undefined;
 	}
 }
-
-
-
-exports.Ball = Ball;

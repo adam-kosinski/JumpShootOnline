@@ -4,6 +4,10 @@ let socket = io();
 let id; //id of the socket
 let am_spectator;
 
+// local copy of the game, so we can do prediction to compensate for latency
+let local_game_state;
+import { Game } from "./Game.js"
+
 //preload the chuckle
 let chuckle = new Audio("./static/chuckle.mp3");
 
@@ -83,7 +87,7 @@ socket.emit("get_state", function(player_statuses, game){
 	if(game){
 		console.log("game already started");
 		document.getElementById("home_screen").style.display = "none";
-		initGameDisplay(game); //display.js
+		initGameDisplay(game, am_spectator); //display.js
 	}
 });
 
@@ -92,7 +96,7 @@ socket.emit("get_state", function(player_statuses, game){
 
 
 //debug -----------------------------------------------
-function getState(){
+window.getState = function(){
 	socket.emit("get_state", function(player_statuses, game){
 		console.log("Player Statuses", player_statuses);
 		console.log("Game", game);
@@ -148,7 +152,7 @@ socket.on("update", async function(game){
 
 socket.on("start_game", function(game){
 	document.getElementById("home_screen").style.display = "none";
-	initGameDisplay(game); //display.js
+	initGameDisplay(game, am_spectator); //display.js
 	console.log("starting game");
 });
 
@@ -156,3 +160,37 @@ socket.on("clear_game", function(){
 	document.getElementById("home_screen").style.display = "block";
 	am_spectator = false;
 });
+
+
+
+// HTML event handlers
+
+document.addEventListener("keydown", handleKeydown);
+document.addEventListener("keyup", handleKeyup);
+document.getElementById("start_game_button").addEventListener("click", startGame);
+document.getElementById("new_game_button").addEventListener("click", newGame);
+document.getElementById("clear_game_button").addEventListener("click", clearGame);
+
+
+function handleKeydown(e){
+  if(!am_spectator) setTimeout(() => socket.emit("keydown", e.key), FAKE_LATENCY);
+}
+
+function handleKeyup(e){
+  if(!am_spectator) setTimeout(() => socket.emit("keyup", e.key), FAKE_LATENCY);
+}
+
+function startGame(){ //from home screen
+  socket.emit("start_game");
+}
+
+function newGame(){ //from game screen
+  if(!am_spectator){
+    socket.emit("end_game", true); //true for immediate new game
+    socket.emit("start_game", true); //same thing
+  }
+}
+
+function clearGame(){
+  if(!am_spectator) socket.emit("end_game");
+}

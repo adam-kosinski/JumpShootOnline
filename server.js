@@ -1,25 +1,25 @@
 //SERVER SETUP --------------------------------------------------------------------------------
 
-// Dependencies
-let express = require("express");
-let http = require("http");
-let path = require("path");
-let socketIO = require("socket.io");
+import express from "express";
+import { Server as SocketIOServer } from "socket.io";
+import { createServer } from "http";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
-
-let Game = require("./Game").Game;
+import { Game } from "./static/Game.js"
 
 //app stuff
 let app = express();
-let server = http.Server(app);
-let io = socketIO(server);
+let server = createServer(app);
+let io = new SocketIOServer(server);
 
 app.set("port", 5000);
-app.use("/static", express.static(__dirname + "/static"));
+const __dirname = dirname(fileURLToPath(import.meta.url))
+app.use('/static', express.static(join(__dirname, 'static')))
 
 // Routing
 app.get("/", function(request, response) {
-  response.sendFile(path.join(__dirname, "index.html"));
+  response.sendFile(__dirname + "/index.html");
 });
 
 // Starts the server.
@@ -130,7 +130,7 @@ io.on("connection", function(socket) {
 
     //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using performance.now() for timings (see Game.update)
     game_interval = setInterval(function(){
-      game.update.apply(game); //call .update() using the game as the 'this' object
+      game.update();
       io.emit("update", game);
     }, 1000/game.LOOP_FREQ);
 
@@ -156,7 +156,7 @@ io.on("connection", function(socket) {
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
       if(p.name == player_name){
-        p.handleKeydown(key);
+        p.handleKeydown(game, key);
       }
     });
     //notice that this logic essentially prevents spectators from doing anything, an extra safety in addition to the checks in events.js
@@ -168,7 +168,7 @@ io.on("connection", function(socket) {
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
       if(p.name == player_name){
-        p.handleKeyup(key);
+        p.handleKeyup(game, key);
       }
     });
   });
@@ -177,4 +177,6 @@ io.on("connection", function(socket) {
 
 
 
-exports.getGame = function(){return game;}
+export function getGame(){
+  return game;
+}

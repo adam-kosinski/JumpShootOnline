@@ -1,4 +1,4 @@
-class Wall
+export class Wall
 {
 	constructor(x, y, width, height, color, border_wall=false)
 	{
@@ -10,6 +10,3 @@ class Wall
 		this.border_wall = border_wall;  //if true, all sides of the wall will block objects, and it won't be possible to press down and fall through the wall
 	}
 }
-
-
-exports.Wall = Wall;

@@ -1,10 +1,9 @@
-let Player = require("./Player").Player;
-let Ball = require("./Ball").Ball;
-let Wall = require("./Wall").Wall;
-const {performance} = require("perf_hooks");
+import { Player } from "./Player.js";
+import { Ball } from "./Ball.js";
+import { Wall } from "./Wall.js";
 
 
-class Game {
+export class Game {
 	constructor(player_names){
 		this.player_names = player_names; //array of strings
 
@@ -73,10 +72,19 @@ class Game {
 		let t_elapsed = performance.now()/1000 - this.t_start;
 
 		//update balls and players  NOTE: doing ball position before players will cause a lag in position when carrying balls... which looks cool!!!
-		this.balls.forEach(b => b.updatePosition(t_elapsed));
-		this.players.forEach(p => p.updatePosition(t_elapsed));
+		this.balls.forEach(b => b.updatePosition(this, t_elapsed));
+		this.players.forEach(p => p.updatePosition(this, t_elapsed));
+	}
+
+	static loadFromJson(json_game){
+		// returns a new game object with players, balls etc. being instances of their respective classes
+
+		// get a new object with the same methods
+		const game = Object.create(Game.prototype);
+
+		// copy over shallow properties
+		Object.assign(game, json_game);
+		
+		return game;
 	}
 }
-
-
-exports.Game = Game;
