@@ -147,6 +147,9 @@ socket.on("update", async function(game){
 	};
 
 	draw(game); //display.js
+
+	// update my local copy of the game
+	if(Math.random() < 0.05) console.log(Game.loadFromJson(game))
 });
 
 

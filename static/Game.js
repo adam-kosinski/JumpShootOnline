@@ -68,6 +68,7 @@ export class Game {
 		}
 	}
 
+
 	update(){
 		let t_elapsed = performance.now()/1000 - this.t_start;
 
@@ -76,15 +77,35 @@ export class Game {
 		this.players.forEach(p => p.updatePosition(this, t_elapsed));
 	}
 
+
 	static loadFromJson(json_game){
 		// returns a new game object with players, balls etc. being instances of their respective classes
 
-		// get a new object with the same methods
+		// get a new object with the same methods, and copy over shallow properties
 		const game = Object.create(Game.prototype);
-
-		// copy over shallow properties
 		Object.assign(game, json_game);
-		
+
+		// recreate players, walls, and balls which need specific prototypes
+		// these only have shallow properties, so the properties can be directly copied
+		game.players = [];
+		for(let p of json_game.players){
+			const player_copy = Object.create(Player.prototype);
+			Object.assign(player_copy, p);
+			game.players.push(player_copy);
+		}
+		game.balls = [];
+		for(let b of json_game.balls){
+			const ball_copy = Object.create(Ball.prototype);
+			Object.assign(ball_copy, b);
+			game.balls.push(ball_copy);
+		}
+		game.walls = [];
+		for(let w of json_game.walls){
+			const wall_copy = Object.create(Wall.prototype);
+			Object.assign(wall_copy, w);
+			game.walls.push(w);
+		}
+
 		return game;
 	}
 }
