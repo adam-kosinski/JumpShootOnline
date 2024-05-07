@@ -2,7 +2,6 @@
 
 let socket = io();
 let id; //id of the socket
-let my_name;
 let am_spectator;
 
 //preload the chuckle
@@ -11,46 +10,56 @@ let chuckle = new Audio("./static/chuckle.mp3");
 //CONNECTION TO SERVER -----------------------------------
 
 //send a new player message to the server, and pick name
-function registerName(){
-	my_name = prompt("Please enter a name (if reconnecting must match previous name):"); //TODO: make this a GUI thing not a prompt
+async function registerName(name){
+	// returns true if success, false if failure
 
-	//filter out no name or canceling the popup
-	if(my_name===""){
-		registerName(); //empty strings don't work, try again
-		return;
-	}
-	if(!my_name){
-		socket.disconnect();
-		throw new Error("Name entry canceled, disconnecting client and leaving webpage blank");
-	}
+	// check if no name or canceling the popup
+	if(!name) return false;
 
-	//check name
-	socket.emit("new player", my_name, function(name_info_string){
-		console.log("Name registration, server returned:", name_info_string);
+	// try to register name with the server
+	return await new Promise((resolve) => {
+		socket.emit("new player", name, function(name_info_string){
+			console.log("Name registration, server returned:", name_info_string);
+	
+			if(name_info_string == "duplicate"){
+				//invalid connection, try again
+				alert(`'${name}' is taken. Please choose another`);
+				resolve(false);
+				return;
+			}
+	
+			//we have a valid connection
+	
+			document.getElementById("load_screen").style.display = "none"; //get rid of black div covering the page
+	
+			if(name_info_string == "spectator"){
+				alert("You are viewing an ongoing game as a spectator.");
+				am_spectator = true;
+			}
+			else {
+				am_spectator = false;
+			}
 
-		if(name_info_string == "duplicate"){
-			//invalid connection, try again
-			alert("'"+my_name+"' is taken. Please choose another");
-			my_name = undefined;
-			registerName();
-			return;
-		}
-
-		//we have a valid connection
-
-		document.getElementById("load_screen").style.display = "none"; //get rid of black div covering the page
-
-		if(name_info_string == "spectator"){
-			alert("You are viewing an ongoing game as a spectator.");
-			am_spectator = true;
-		}
-		else {
-			am_spectator = false;
-		}
+			// return true from registerName()
+			resolve(true);
+		});
 	});
 }
 
-registerName();
+// loop to get a valid name, save it in the URL so that reloading is nice
+(async () => {
+	// first try to use the URL
+	const url = new URL(window.location);
+	let name = url.searchParams.get("player");
+
+	while(!(await registerName(name))){
+		// ask the user for name input until they give a valid one
+		name = prompt("Please enter a name (if reconnecting must match previous name):"); //TODO: make this a GUI thing not a prompt
+	}
+	// save to the url so we can use it next time
+	url.search = new URLSearchParams(`player=${name}`)
+	window.history.replaceState(null, "", url);
+})();
 
 
 //store the id of the connection
@@ -73,10 +82,8 @@ socket.on("disconnect", function(){
 socket.emit("get_state", function(player_statuses, game){
 	if(game){
 		console.log("game already started");
+		document.getElementById("home_screen").style.display = "none";
 		initGameDisplay(game); //display.js
-	}
-	else {
-		document.getElementById("home_screen").style.display = "block";
 	}
 });
 
@@ -117,7 +124,10 @@ socket.on("player_connection", function(player_statuses){
 
 
 
-socket.on("update", function(game){
+socket.on("update", async function(game){
+
+	// fake latency coming back from server
+	await new Promise((resolve) => setTimeout(resolve, FAKE_LATENCY))
 
 	//play chungus chuckle for each rabbit that just got hurt and update health display
 	for(let i=0; i<game.players.length; i++){

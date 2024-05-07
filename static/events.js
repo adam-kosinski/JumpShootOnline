@@ -5,13 +5,12 @@ document.getElementById("new_game_button").addEventListener("click", newGame);
 document.getElementById("clear_game_button").addEventListener("click", clearGame);
 
 
-
 function handleKeydown(e){
-  if(!am_spectator) socket.emit("keydown", e.key);
+  if(!am_spectator) setTimeout(() => socket.emit("keydown", e.key), FAKE_LATENCY);
 }
 
 function handleKeyup(e){
-  if(!am_spectator) socket.emit("keyup", e.key);
+  if(!am_spectator) setTimeout(() => socket.emit("keyup", e.key), FAKE_LATENCY);
 }
 
 function startGame(){ //from home screen

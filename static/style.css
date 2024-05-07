@@ -32,7 +32,7 @@ button {
 
 /* home screen ----------------------------------------------------*/
 #home_screen {
-	display: none;
+	display: block;
 	width: 100vw;
 	height: 100vh;
 	background-color: navajowhite;

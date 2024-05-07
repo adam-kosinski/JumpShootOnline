@@ -1,29 +1,35 @@
 <!doctype html>
 <html>
-	<head>
-		<title>JumpShoot</title>
-		<link type="text/css" rel="stylesheet" href="/static/style.css"/>
-		<script src="/socket.io/socket.io.js"></script>
-	</head>
-	<body>
 
-		<div id="load_screen"></div>
+<head>
+	<title>JumpShoot</title>
+	<link type="text/css" rel="stylesheet" href="/static/style.css" />
+	<script src="/socket.io/socket.io.js"></script>
+</head>
 
-		<div id="home_screen">
-			<h1>Welcome!</h1>
-			<img id="home_screen_image" src="/static/images/home_screen_image.png"/>
-			<div id="player_display"></div>
-			<button id="start_game_button">Start Game</button>
-		</div>
+<body>
 
-		<canvas id="canvas"></canvas>
-		<div id="health_bars"></div>
-		<br>
-		<button id="new_game_button">New game</button>
-		<button id="clear_game_button">Clear and quit to home</button>
+	<div id="load_screen"></div>
 
-		<script src="/static/display.js"></script>
-		<script src="/static/events.js"></script>
-		<script src="/static/client.js"></script>
-	</body>
+	<div id="home_screen">
+		<h1>Welcome!</h1>
+		<img id="home_screen_image" src="/static/images/home_screen_image.png" />
+		<div id="player_display"></div>
+		<button id="start_game_button">Start Game</button>
+	</div>
+
+	<canvas id="canvas"></canvas>
+	<div id="health_bars"></div>
+	<br>
+	<button id="new_game_button">New game</button>
+	<button id="clear_game_button">Clear and quit to home</button>
+
+	<script>
+		const FAKE_LATENCY = 100; //ms
+	</script>
+	<script src="/static/display.js"></script>
+	<script src="/static/events.js"></script>
+	<script src="/static/client.js"></script>
+</body>
+
 </html>
