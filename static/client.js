@@ -6,6 +6,7 @@ let am_spectator;
 
 // local copy of the game, so we can do prediction to compensate for latency
 let local_game_state;
+let server_time_offset;
 import { Game } from "./Game.js"
 
 //preload the chuckle
@@ -128,10 +129,7 @@ socket.on("player_connection", function(player_statuses){
 
 
 
-socket.on("update", async function(game){
-
-	// fake latency coming back from server
-	await new Promise((resolve) => setTimeout(resolve, FAKE_LATENCY))
+socket.on("update", async function(game, current_time){
 
 	//play chungus chuckle for each rabbit that just got hurt and update health display
 	for(let i=0; i<game.players.length; i++){
@@ -146,11 +144,22 @@ socket.on("update", async function(game){
 		}
 	};
 
-	draw(game); //display.js
+	// draw(game); //display.js
 
 	// update my local copy of the game
-	if(Math.random() < 0.05) console.log(Game.loadFromJson(game))
+	local_game_state = Game.loadFromJson(game);
+	server_time_offset = current_time - performance.now();
+	// draw(local_game_state);
+
 });
+
+
+const LOCAL_LOOP_FREQ = 40; // hz
+setInterval(() => {
+	if(!local_game_state || !server_time_offset) return;
+	local_game_state.update(performance.now() + server_time_offset);
+	draw(local_game_state);
+}, 1000/LOCAL_LOOP_FREQ);
 
 
 socket.on("start_game", function(game){
@@ -176,11 +185,11 @@ document.getElementById("clear_game_button").addEventListener("click", clearGame
 
 
 function handleKeydown(e){
-  if(!am_spectator) setTimeout(() => socket.emit("keydown", e.key), FAKE_LATENCY);
+  if(!am_spectator) socket.emit("keydown", e.key)
 }
 
 function handleKeyup(e){
-  if(!am_spectator) setTimeout(() => socket.emit("keyup", e.key), FAKE_LATENCY);
+  if(!am_spectator) socket.emit("keyup", e.key)
 }
 
 function startGame(){ //from home screen

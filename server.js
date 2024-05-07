@@ -130,9 +130,10 @@ io.on("connection", function(socket) {
 
     //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using performance.now() for timings (see Game.update)
     game_interval = setInterval(function(){
-      game.update();
-      io.emit("update", game);
-    }, 1000/game.LOOP_FREQ);
+      const now = performance.now();
+      game.update(now);
+      io.emit("update", game, now);
+    }, 1000 / 40);  // 1000ms divided by loop freq in hz
 
     io.emit("start_game", game); //let everyone know
   });
@@ -150,8 +151,10 @@ io.on("connection", function(socket) {
   });
 
 
-  socket.on("keydown", function(key){
+  socket.on("keydown", async function(key){
     if(!game) return;
+
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
@@ -162,8 +165,10 @@ io.on("connection", function(socket) {
     //notice that this logic essentially prevents spectators from doing anything, an extra safety in addition to the checks in events.js
   });
 
-  socket.on("keyup", function(key){
+  socket.on("keyup", async function(key){
     if(!game) return;
+
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {

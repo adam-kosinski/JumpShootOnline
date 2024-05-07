@@ -23,8 +23,7 @@ export class Game {
 		this.hat_aspect_ratios = [346/194, 168/129, 200/137, 190/99];
 			//note: hats required to be .png b/c of how display.js figures out the image src
 
-		//update loop
-		this.LOOP_FREQ = 40; //hz
+		//set reference start time
 		this.t_start = performance.now() / 1000;
 
 		this.init();
@@ -69,8 +68,9 @@ export class Game {
 	}
 
 
-	update(){
-		let t_elapsed = performance.now()/1000 - this.t_start;
+	update(time_now){
+		let t_elapsed = time_now/1000 - this.t_start;
+		console.log(t_elapsed)
 
 		//update balls and players  NOTE: doing ball position before players will cause a lag in position when carrying balls... which looks cool!!!
 		this.balls.forEach(b => b.updatePosition(this, t_elapsed));
