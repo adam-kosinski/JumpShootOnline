@@ -127,17 +127,16 @@ socket.on("player_connection", function(player_statuses){
 
 
 
-socket.on("update", async function(game, current_time){
+socket.on("update", async function(game){
 	// update my local copy of the game
 	local_game_state = Game.loadFromJson(game);
-	server_time_offset = current_time - performance.now();
 });
 
 
 const LOCAL_LOOP_FREQ = 40; // hz
 setInterval(() => {
-	if(!local_game_state || !server_time_offset) return;
-	local_game_state.update(performance.now() + server_time_offset);
+	if(!local_game_state) return;
+	local_game_state.update(Date.now());
 	updateGameDisplay(local_game_state);
 }, 1000/LOCAL_LOOP_FREQ);
 

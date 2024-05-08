@@ -23,8 +23,9 @@ export class Game {
 		this.hat_aspect_ratios = [346/194, 168/129, 200/137, 190/99];
 			//note: hats required to be .png b/c of how display.js figures out the image src
 
-		//set reference start time
-		this.t_start = performance.now() / 1000;
+		//time variables
+		this.t_start = Date.now() / 1000; // this is the only absolute time, all others in the code are relative to this, for easier interpretability
+		this.t_last_update = 0;
 
 		this.init();
 	}
@@ -68,8 +69,8 @@ export class Game {
 	}
 
 
-	update(time_now){ // time_now is an argument, because we can't just use performance.now() in this function - that differs for server vs. clients
-		let t_elapsed = time_now/1000 - this.t_start;
+	update(time_now_ms){ // time_now_ms is an argument, because we sometimes do updates in the past to calculate things
+		const t_elapsed = time_now_ms/1000 - this.t_start;
 
 		//update balls and players  NOTE: doing ball position before players will cause a lag in position when carrying balls... which looks cool!!!
 		this.balls.forEach(b => b.updatePosition(this, t_elapsed));

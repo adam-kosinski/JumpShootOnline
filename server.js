@@ -128,11 +128,10 @@ io.on("connection", function(socket) {
     player_names = player_names.filter(name => player_statuses[name].connected);
     game = new Game(player_names);
 
-    //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using performance.now() for timings (see Game.update)
+    //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using Date.now() for timings (see Game.update)
     game_interval = setInterval(function(){
-      const now = performance.now();
-      game.update(now);
-      io.emit("update", game, now);
+      game.update(Date.now());
+      io.emit("update", game);
     }, 1000 / 10);  // 1000ms divided by loop freq in hz
 
     io.emit("start_game", game); //let everyone know
@@ -159,7 +158,7 @@ io.on("connection", function(socket) {
     await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
 
     // update what has happened between the last game loop update and now
-    game.update(performance.now());
+    game.update(Date.now());
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
@@ -176,7 +175,7 @@ io.on("connection", function(socket) {
     await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
 
     // update what has happened between the last game loop update and now
-    game.update(performance.now());
+    game.update(Date.now());
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
