@@ -9,8 +9,6 @@ let local_game_state;
 let server_time_offset;
 import { Game } from "./Game.js"
 
-//preload the chuckle
-let chuckle = new Audio("./static/chuckle.mp3");
 
 //CONNECTION TO SERVER -----------------------------------
 
@@ -130,27 +128,9 @@ socket.on("player_connection", function(player_statuses){
 
 
 socket.on("update", async function(game, current_time){
-
-	//play chungus chuckle for each rabbit that just got hurt and update health display
-	for(let i=0; i<game.players.length; i++){
-		let p = game.players[i];
-		if(p.time == p.t_hit){
-			chuckle.play(); //loaded at the top of this file
-
-			let hearts_div = document.getElementById("player" + i + "_hearts");
-			if(hearts_div.lastElementChild){
-				hearts_div.removeChild(hearts_div.lastElementChild);
-			}
-		}
-	};
-
-	// draw(game); //display.js
-
 	// update my local copy of the game
 	local_game_state = Game.loadFromJson(game);
 	server_time_offset = current_time - performance.now();
-	// draw(local_game_state);
-
 });
 
 
@@ -158,7 +138,7 @@ const LOCAL_LOOP_FREQ = 40; // hz
 setInterval(() => {
 	if(!local_game_state || !server_time_offset) return;
 	local_game_state.update(performance.now() + server_time_offset);
-	draw(local_game_state);
+	updateGameDisplay(local_game_state);
 }, 1000/LOCAL_LOOP_FREQ);
 
 

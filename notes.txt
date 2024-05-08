@@ -1,0 +1,14 @@
+Should really have the time synchronized via linux timestamps
+
+Weird glitch where you can throw a ball into the corner and it will fall through the floor
+
+
+
+DONE
+
+
+All keypresses need to be timestamped, and calculations done based on this, to stop weird glitchiness
+
+- this is because if you let go of the key between updates, the server
+assumes you didn't move at all since the last update, when in fact you
+were moving for part of the update

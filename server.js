@@ -158,6 +158,9 @@ io.on("connection", function(socket) {
 
     await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
 
+    // update what has happened between the last game loop update and now
+    game.update(performance.now());
+
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {
       if(p.name == player_name){
@@ -171,6 +174,9 @@ io.on("connection", function(socket) {
     if(!game) return;
 
     await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
+
+    // update what has happened between the last game loop update and now
+    game.update(performance.now());
 
     let player_name = id_to_name[socket.id];
     game.players.forEach(p => {

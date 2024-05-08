@@ -9,6 +9,9 @@ left_chungus.src = "./static/images/leftChungus.png";
 let right_chungus = document.createElement("img");
 right_chungus.src = "./static/images/rightChungus.png";
 
+//preload the chuckle
+let chuckle = new Audio("./static/chuckle.mp3");
+
 
 
 function initGameDisplay(game, am_spectator){
@@ -68,7 +71,22 @@ function initHealthBars(game){
 
 
 
-function draw(game){
+function updateGameDisplay(game){
+
+  //play chungus chuckle for each rabbit that just got hurt and update health display
+	for(let i=0; i<game.players.length; i++){
+		let p = game.players[i];
+		if(p.time == p.t_hit){
+			chuckle.play(); //loaded at the top of this file
+
+			let hearts_div = document.getElementById("player" + i + "_hearts");
+			if(hearts_div.lastElementChild){
+				hearts_div.removeChild(hearts_div.lastElementChild);
+			}
+		}
+	}
+
+  // update canvas
 
   let ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
