@@ -26,7 +26,7 @@ export class Game {
 		//note: hats required to be .png b/c of how display.js figures out the image src
 
 		//time variables
-		this.timestamp_start = Date.now() / 1000; // only things labeled 'timestamp' are absolute times, all others in the code are relative to this, allows initializing times to 0
+		this.start_timestamp = Date.now() / 1000; // only things labeled 'timestamp' are absolute times, all others in the code are relative to this, allows initializing times to 0
 		this.last_update_timestamp = 0;
 
 		this.init();
@@ -83,6 +83,7 @@ export class Game {
 		// go through queued actions
 		while(this.key_action_queue[0]?.timestamp <= up_to_timestamp){
 			const { player_name, action, key, timestamp } = this.key_action_queue.splice(0, 1)[0];
+
 			// update positions up to this point
 			this.updatePositions(timestamp);
 			// process the action
@@ -100,7 +101,7 @@ export class Game {
 
 
 	updatePositions(timestamp) { // time is an argument, because we sometimes do updates in chunks to calculate position changes between player inputs
-		const t_since_start = timestamp / 1000 - this.timestamp_start;
+		const t_since_start = timestamp / 1000 - this.start_timestamp;
 		//update balls and players - do players before balls because carried ball position depends on player position
 		this.players.forEach(p => p.updatePosition(this, t_since_start));
 		this.balls.forEach(b => b.updatePosition(this, t_since_start));

@@ -23,6 +23,8 @@ function initGameDisplay(game, am_spectator) {
   canvas.style.width = width + "px";
   canvas.style.height = height + "px";
 
+  updateHealthBars(game);
+
   // filter display based on if I am a spectator
   document.getElementById("new_game_button").style.display = am_spectator ? "none" : "inline-block";
   document.getElementById("clear_game_button").style.display = am_spectator ? "none" : "inline-block";
@@ -70,11 +72,10 @@ function updateGameDisplay(game, prev_game=undefined) {
     for (let i = 0; i < game.players.length; i++) {
       if (game.players[i].health !== prev_game.players[i].health) {
         chuckle.play(); //loaded at the top of this file
+        updateHealthBars(game);
       }
     }
   }
-  updateHealthBars(game);
-  
 
   // update canvas
 

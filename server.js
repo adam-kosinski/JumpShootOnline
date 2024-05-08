@@ -124,9 +124,11 @@ io.on("connection", function(socket) {
 
     //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using Date.now() for timings (see Game.update)
     game_interval = setInterval(function(){
-      game.update(Date.now());
+      if(game.key_action_queue.length > 0){
+        game.update(game.key_action_queue[game.key_action_queue.length - 1].timestamp);
+      }
       io.emit("update", game);
-    }, 1000 / 40);  // 1000ms divided by loop freq in hz
+    }, 1000 / 10);  // 1000ms divided by loop freq in hz
 
     io.emit("start_game", game); //let everyone know
   });
@@ -152,21 +154,16 @@ io.on("connection", function(socket) {
     handleKeyAction(id_to_name[socket.id], "keyup", key, timestamp)
   });
 
+
   async function handleKeyAction(player_name, action, key, timestamp){
     // check if valid action
     if(!game) return;
     if(!game.players.find(p => p.name === player_name)) return;
 
     // fake latency
-    await new Promise(resolve => setTimeout(resolve, 0))
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     // add action to queue
     game.queueKeyAction(player_name, action, key, timestamp);
   }
 });
-
-
-
-export function getGame(){
-  return game;
-}
