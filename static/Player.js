@@ -25,7 +25,7 @@ export class Player {
 		this.time = 0; //time of most recent updatePosition call
 		this.ti_x = 0; //time of most recent x velocity reset
 		this.ti_y = 0; //time of most recent y velocity reset
-		this.t_hit = -Infinity; //time the player most recently got hit, used for making them red when hit and for invincibility period
+		this.t_hit = -1000; //time the player most recently got hit, used for making them red when hit and for invincibility period
 		//since a player will be red if time_now - time_hit < RED_COLOR_TIMEOUT, make sure they're not red to start out by making this very negative
 		this.t_died = undefined; //time when lost last life, used for fall-over animation
 
@@ -102,7 +102,7 @@ export class Player {
 
 					//if the center of the ball is within the player, we can pick it up
 					if (b.x > this.x && b.x < this.x + this.width && b.y > this.y && b.y < this.y + this.height) {
-						
+
 						let my_player_index = game.players.indexOf(this);
 						if (my_player_index < 0) throw new Error("Failed to get player index when determining ball holder, player not found in players array.");
 
@@ -277,6 +277,7 @@ export class Player {
 			if (b.x > this.x && b.x < this.x + this.width && b.y > this.y && b.y < this.y + this.height
 				&& time - this.t_hit > this.HIT_INVINCIBLE_TIMEOUT && time - this.t_threw_ball > this.THROWER_INVINCIBLE_TIMEOUT
 				&& this.health > 0) {
+
 				this.health = Math.max(this.health - 1, 0);
 				b.setNotDangerous();
 				this.t_hit = time;

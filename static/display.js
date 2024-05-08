@@ -29,6 +29,8 @@ function initGameDisplay(game, am_spectator) {
 }
 
 
+
+
 function updateHealthBars(game) {
   let container = document.getElementById("health_bars");
   container.innerHTML = "";
@@ -61,17 +63,18 @@ function updateHealthBars(game) {
 
 
 
-
-function updateGameDisplay(game) {
+function updateGameDisplay(game, prev_game=undefined) {
 
   //play chungus chuckle for each rabbit that just got hurt and update health display
-  for (let i = 0; i < game.players.length; i++) {
-    let p = game.players[i];
-    if (p.time === p.t_hit) {
-      chuckle.play(); //loaded at the top of this file
+  if (prev_game !== undefined){
+    for (let i = 0; i < game.players.length; i++) {
+      if (game.players[i].health !== prev_game.players[i].health) {
+        chuckle.play(); //loaded at the top of this file
+      }
     }
-    updateHealthBars(game);
   }
+  updateHealthBars(game);
+  
 
   // update canvas
 
