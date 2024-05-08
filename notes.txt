@@ -1,14 +1,18 @@
-Should really have the time synchronized via linux timestamps
-
 Weird glitch where you can throw a ball into the corner and it will fall through the floor
+
+Don't need id_to_name in server.js, can just store the player name in the io.on("connection") scope
+And don't need to keep track of connected / disconnected in a player status
+- oh wait I remember why we did this - to prevent more than one connection at a time from accessing / being a certain player
+- feels like there might be some way to hack this hmm
+
 
 
 
 DONE
 
+Should really have the time synchronized via linux timestamps
 
 All keypresses need to be timestamped, and calculations done based on this, to stop weird glitchiness
-
 - this is because if you let go of the key between updates, the server
 assumes you didn't move at all since the last update, when in fact you
 were moving for part of the update

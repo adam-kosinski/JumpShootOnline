@@ -55,7 +55,6 @@ io.on("connection", function(socket) {
 
   // PLAYER CONNECTIONS ----------------------------------------------
 
-
 	socket.on("new player", function(name, callback){
     //return: "success" or "duplicate" or "spectator"
 
@@ -104,11 +103,9 @@ io.on("connection", function(socket) {
 	socket.on("disconnect", function(){
 		if(id_to_name.hasOwnProperty(socket.id)){
 			console.log(id_to_name[socket.id]+" disconnected (id: " + socket.id + ")");
-
 			let player = player_statuses[id_to_name[socket.id]];
 			player.connected = false;
 			delete id_to_name[socket.id];
-
 		}
 		io.emit("player_connection", player_statuses);
 	});
@@ -118,22 +115,18 @@ io.on("connection", function(socket) {
 	});
 
 
-
-
   socket.on("start_game", function(replaying=false){ //if for an immediate new game, keep same players
-
     console.log("Starting new game! - replaying: " + replaying);
 
     let player_names = (replaying && game) ? game.player_names : Object.keys(player_statuses);
     player_names = player_names.filter(name => player_statuses[name].connected);
     game = new Game(player_names);
 
-
     //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using Date.now() for timings (see Game.update)
     game_interval = setInterval(function(){
       game.update(Date.now());
       io.emit("update", game);
-    }, 1000 / 10);  // 1000ms divided by loop freq in hz
+    }, 1000 / 40);  // 1000ms divided by loop freq in hz
 
     io.emit("start_game", game); //let everyone know
   });
@@ -151,41 +144,25 @@ io.on("connection", function(socket) {
   });
 
 
-  const FAKE_LATENCY = 0;
-
   socket.on("keydown", async function(key, timestamp){
-    if(!game) return;
-
-    await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
-
-    // update what has happened between the last game loop update and now
-    game.update(timestamp);
-
-    let player_name = id_to_name[socket.id];
-    game.players.forEach(p => {
-      if(p.name == player_name){
-        p.handleKeydown(game, key);
-      }
-    });
-    //notice that this logic essentially prevents spectators from doing anything, an extra safety in addition to the checks in events.js
+    handleKeyAction(id_to_name[socket.id], "keydown", key, timestamp)
   });
 
   socket.on("keyup", async function(key, timestamp){
-    if(!game) return;
-
-    await new Promise(resolve => setTimeout(resolve, FAKE_LATENCY))
-
-    // update what has happened between the last game loop update and now
-    game.update(timestamp);
-
-    let player_name = id_to_name[socket.id];
-    game.players.forEach(p => {
-      if(p.name == player_name){
-        p.handleKeyup(game, key);
-      }
-    });
+    handleKeyAction(id_to_name[socket.id], "keyup", key, timestamp)
   });
 
+  async function handleKeyAction(player_name, action, key, timestamp){
+    // check if valid action
+    if(!game) return;
+    if(!game.players.find(p => p.name === player_name)) return;
+
+    // fake latency
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    // add action to queue
+    game.queueKeyAction(player_name, action, key, timestamp);
+  }
 });
 
 

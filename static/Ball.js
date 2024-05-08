@@ -107,6 +107,8 @@ export class Ball {
 					this.y = w.y + w.height + this.r;
 					this.y_collision = -1;
 					this.setYVelocity(0);
+
+					console.log("collision above")
 				}
 
 				//x

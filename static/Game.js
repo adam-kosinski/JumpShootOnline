@@ -26,8 +26,8 @@ export class Game {
 		//note: hats required to be .png b/c of how display.js figures out the image src
 
 		//time variables
-		this.t_start = Date.now() / 1000; // this is the only absolute time, all others in the code are relative to this, allows initializing times to 0
-		this.t_last_update = 0; // relative
+		this.timestamp_start = Date.now() / 1000; // only things labeled 'timestamp' are absolute times, all others in the code are relative to this, allows initializing times to 0
+		this.last_update_timestamp = 0;
 
 		this.init();
 	}
@@ -71,20 +71,39 @@ export class Game {
 	}
 
 
-	queueKeyAction(player, action, key, timestamp) {
+	queueKeyAction(player_name, action, key, timestamp) {
 		// action can be "keydown" or "keyup", timestamp is from the client's Date.now()
-		this.key_action_queue.push({ player, action, key, timestamp })
+		this.key_action_queue.push({ player_name, action, key, timestamp })
 	}
 
 
-	update(time_now_ms) { // time_now_ms is an argument, because we sometimes do updates in chunks to calculate position changes between player inputs
-		const t_since_start = time_now_ms / 1000 - this.t_start;
+	update(up_to_timestamp) {
+		// process queued actions and update positions, up to the timestamp given
 
-		//update balls and players  NOTE: doing ball position before players will cause a lag in position when carrying balls... which looks cool!!!
-		this.balls.forEach(b => b.updatePosition(this, t_since_start));
+		// go through queued actions
+		while(this.key_action_queue[0]?.timestamp <= up_to_timestamp){
+			const { player_name, action, key, timestamp } = this.key_action_queue.splice(0, 1)[0];
+			// update positions up to this point
+			this.updatePositions(timestamp);
+			// process the action
+			const player = this.players.find(p => p.name === player_name);
+			if(player){
+				if(action === "keydown") player.handleKeydown(this, key);
+				if(action === "keyup") player.handleKeyup(this, key);
+			}
+		}
+		// update positions to the final timestamp
+		this.updatePositions(up_to_timestamp);
+
+		this.last_update_timestamp = up_to_timestamp;
+	}
+
+
+	updatePositions(timestamp) { // time is an argument, because we sometimes do updates in chunks to calculate position changes between player inputs
+		const t_since_start = timestamp / 1000 - this.timestamp_start;
+		//update balls and players - do players before balls because carried ball position depends on player position
 		this.players.forEach(p => p.updatePosition(this, t_since_start));
-
-		this.t_last_update = t_since_start;
+		this.balls.forEach(b => b.updatePosition(this, t_since_start));
 	}
 
 
