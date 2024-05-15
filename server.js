@@ -126,7 +126,7 @@ io.on("connection", function(socket) {
     game_interval = setInterval(function(){
       game.update(Date.now());
       io.emit("update", game);
-    }, 1000 / 10);  // 1000ms divided by loop freq in hz
+    }, 1000 / 40);  // 1000ms divided by loop freq in hz
 
     io.emit("start_game", game); //let everyone know
   });
@@ -144,24 +144,36 @@ io.on("connection", function(socket) {
   });
 
 
-  socket.on("keydown", async function(key, timestamp){
-    handleKeyAction(id_to_name[socket.id], "keydown", key, timestamp)
-  });
+  // socket.on("keydown", async function(key, timestamp){
+  //   handleKeyAction(id_to_name[socket.id], "keydown", key, timestamp)
+  // });
 
-  socket.on("keyup", async function(key, timestamp){
-    handleKeyAction(id_to_name[socket.id], "keyup", key, timestamp)
-  });
+  // socket.on("keyup", async function(key, timestamp){
+  //   handleKeyAction(id_to_name[socket.id], "keyup", key, timestamp)
+  // });
 
-
-  async function handleKeyAction(player_name, action, key, timestamp){
+  socket.on("key_action", async key_action => {
     // check if valid action
     if(!game) return;
-    if(!game.players.find(p => p.name === player_name)) return;
+    if(!game.isValidKeyAction(key_action)) return;
 
     // fake latency
-    // await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 300))
 
     // add action to queue
-    game.queueKeyAction(player_name, action, key, timestamp);
-  }
+    game.key_action_queue.push(key_action);
+  });
+
+
+  // async function handleKeyAction(player_name, action, key, timestamp){
+  //   // check if valid action
+  //   if(!game) return;
+  //   if(!game.players.find(p => p.name === player_name)) return;
+
+  //   // fake latency
+  //   await new Promise(resolve => setTimeout(resolve, 300))
+
+  //   // add action to queue
+  //   game.queueKeyAction(player_name, action, key, timestamp);
+  // }
 });

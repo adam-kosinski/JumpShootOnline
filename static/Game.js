@@ -71,10 +71,14 @@ export class Game {
 		}
 	}
 
-
-	queueKeyAction(player_name, action, key, timestamp) {
-		// action can be "keydown" or "keyup", timestamp is from the client's Date.now()
-		this.key_action_queue.push({ player_name, action, key, timestamp })
+	
+	isValidKeyAction(key_action) {
+		if(typeof(key_action) !== "object") return false;
+		if(!"player_name" in key_action || !"action" in key_action || !"key" in key_action || !"timestamp" in key_action) return false;
+		if(!this.players.find(p => p.name === key_action.player_name)) return false;
+		if(!(key_action.action === "keydown" || key_action.action === "keyup")) return false;
+		if(typeof(key_action.timestamp) !== "number" || key_action.timestamp < 0) return false;
+		return true;
 	}
 
 
@@ -121,7 +125,7 @@ export class Game {
 	// }
 
 
-	update(target_timestamp) {
+	update(target_timestamp, json_game) {
 		// process queued actions and update positions, so that the game is at the timestamp passed in
 
 		// make sure the key action queue is always in order
@@ -133,12 +137,11 @@ export class Game {
 		Game.loadFromJson(this.initial_state, this);
 		this.key_action_queue = key_action_queue;
 
-		console.log("x initial", this.players[0].x)
-
-		// step through time
+		// step through time in small increments
 		let prev_t = 0;
 		for (let t = this.start_timestamp; t <= target_timestamp; t += 1000 / 40) { // 40 steps per 1s = 1000 ms
-			// go through queued actions
+
+			// go through queued actions, process the ones that belong to this increment of time
 			for (let key_action of this.key_action_queue) {
 
 				// ignore actions that aren't part of this time step
@@ -150,20 +153,12 @@ export class Game {
 					if (key_action.action === "keydown") player.handleKeydown(this, key_action.key);
 					if (key_action.action === "keyup") player.handleKeyup(this, key_action.key);
 				}
-
-				// console.log(`t=${(key_action.timestamp - this.start_timestamp) / 1000} x=${this.players[0].x} ${key_action.action} ${key_action.key} [${this.players[0].keys_down}]`)
 			}
+			// update positions for this time step
 			this.updatePositions(t);
+
 			prev_t = t;
 		}
-
-		// update positions to the final timestamp
-		// console.log(this.players[0].y_collision)
-		// this.updatePositions(target_timestamp);
-		// console.log(this.players[0].y_collision)
-
-		console.log(`t=${(target_timestamp - this.start_timestamp) / 1000} x=${this.players[0].x}`)
-		console.log("-----")
 	}
 
 

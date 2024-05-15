@@ -65,7 +65,7 @@ function updateHealthBars(game) {
 
 
 
-function updateGameDisplay(game, prev_game = undefined) {
+function updateGameDisplay(game) {
 
   //play chungus chuckle for each rabbit that just got hurt and update health display
   for (let i = 0; i < game.players.length; i++) {

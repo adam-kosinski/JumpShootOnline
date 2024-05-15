@@ -2,7 +2,6 @@
 
 let socket = io();
 let my_name;
-let id; //id of the socket
 let am_spectator;
 
 // local copy of the game, so we can do prediction to compensate for latency
@@ -53,7 +52,6 @@ async function registerName(name) {
 //store the id of the connection
 socket.on("connect", function () {
 	console.log("My ID: " + socket.id);
-	id = socket.id;
 });
 
 
@@ -71,9 +69,11 @@ socket.on("disconnect", function () {
 
 //debug -----------------------------------------------
 window.getState = function () {
+	const t0 = performance.now();
 	socket.emit("get_state", function (player_statuses, game) {
 		console.log("Player Statuses", player_statuses);
 		console.log("Game", game);
+		console.log("Round trip latency (ms):", performance.now() - t0);
 	});
 }
 
@@ -118,15 +118,15 @@ socket.on("clear_game", function () {
 
 
 socket.on("update", async function (game) {
-	local_game_state = Game.loadFromJson(game);
-	// updateGameDisplay(game);
+	if(!local_game_state) local_game_state = Game.loadFromJson(game);
+	updateGameDisplay(game);
 });
 
 const LOCAL_LOOP_FREQ = 40; // hz
 setInterval(() => {
 	if (!local_game_state) return;
 	local_game_state.update(Date.now());
-	updateGameDisplay(local_game_state);
+	// updateGameDisplay(local_game_state);
 }, 1000 / LOCAL_LOOP_FREQ);
 
 
@@ -134,24 +134,23 @@ setInterval(() => {
 
 // HTML event handlers
 
-document.addEventListener("keydown", handleKeydown);
-document.addEventListener("keyup", handleKeyup);
+document.addEventListener("keydown", handleKeyEvent);
+document.addEventListener("keyup", handleKeyEvent);
 document.getElementById("start_game_button").addEventListener("click", startGame);
 document.getElementById("new_game_button").addEventListener("click", newGame);
 document.getElementById("clear_game_button").addEventListener("click", clearGame);
 
 
-function handleKeydown(e) {
+function handleKeyEvent(e) {
 	if (am_spectator) return;
 	if (e.repeat) return;
-	socket.emit("keydown", e.key, Date.now());
-	local_game_state.queueKeyAction(my_name, "keydown", e.key, Date.now());
-}
 
-function handleKeyup(e) {
-	if (am_spectator) return;
-	socket.emit("keyup", e.key, Date.now());
-	local_game_state.queueKeyAction(my_name, "keyup", e.key, Date.now());
+	socket.emit("key_action", {
+		player_name: my_name,
+		action: e.type,
+		key: e.key,
+		timestamp: Date.now()
+	});
 }
 
 function startGame() { //from home screen

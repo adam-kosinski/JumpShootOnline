@@ -1,15 +1,13 @@
 Weird glitch where you can throw a ball into the corner and it will fall through the floor
+- seems fixed maybe??
 
 Don't need id_to_name in server.js, can just store the player name in the io.on("connection") scope
 And don't need to keep track of connected / disconnected in a player status
 - oh wait I remember why we did this - to prevent more than one connection at a time from accessing / being a certain player
 - feels like there might be some way to hack this hmm
 
-Recalculating game from key action list bugs:
-- can walk off a platform and hover in mid air
-- similarly sometimes phase up and down onto platforms when moving left/right
-- ball throwing is completely wrong with collisions and friction
-
+With latency and just drawing the server's states, the bunny does a weird jump-forward then jump-backward thing when moving sideways.
+Seems a bit similar to the keys-down-list-not-being-independent-when-copied bug I had before
 
 
 DONE
@@ -20,3 +18,8 @@ All keypresses need to be timestamped, and calculations done based on this, to s
 - this is because if you let go of the key between updates, the server
 assumes you didn't move at all since the last update, when in fact you
 were moving for part of the update
+
+Recalculating game from key action list bugs (fixed by using time-stepping to recalculate history)
+- can walk off a platform and hover in mid air
+- similarly sometimes phase up and down onto platforms when moving left/right
+- ball throwing is completely wrong with collisions and friction
