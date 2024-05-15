@@ -119,14 +119,14 @@ socket.on("clear_game", function () {
 
 socket.on("update", async function (game) {
 	local_game_state = Game.loadFromJson(game);
-	updateGameDisplay(game);
+	// updateGameDisplay(game);
 });
 
-const LOCAL_LOOP_FREQ = 10; // hz
+const LOCAL_LOOP_FREQ = 40; // hz
 setInterval(() => {
 	if (!local_game_state) return;
 	local_game_state.update(Date.now());
-	// updateGameDisplay(local_game_state);
+	updateGameDisplay(local_game_state);
 }, 1000 / LOCAL_LOOP_FREQ);
 
 
