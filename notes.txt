@@ -5,6 +5,10 @@ And don't need to keep track of connected / disconnected in a player status
 - oh wait I remember why we did this - to prevent more than one connection at a time from accessing / being a certain player
 - feels like there might be some way to hack this hmm
 
+Recalculating game from key action list bugs:
+- can walk off a platform and hover in mid air
+- similarly sometimes phase up and down onto platforms when moving left/right
+- ball throwing is completely wrong with collisions and friction
 
 
 

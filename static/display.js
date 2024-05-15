@@ -65,15 +65,14 @@ function updateHealthBars(game) {
 
 
 
-function updateGameDisplay(game, prev_game=undefined) {
+function updateGameDisplay(game, prev_game = undefined) {
 
   //play chungus chuckle for each rabbit that just got hurt and update health display
-  if (prev_game !== undefined){
-    for (let i = 0; i < game.players.length; i++) {
-      if (game.players[i].health !== prev_game.players[i].health) {
-        chuckle.play(); //loaded at the top of this file
-        updateHealthBars(game);
-      }
+  for (let i = 0; i < game.players.length; i++) {
+    const prev_displayed_health = document.getElementById("player" + i + "_hearts").childElementCount;
+    if (game.players[i].health !== prev_displayed_health) {
+      chuckle.play(); //loaded at the top of this file
+      updateHealthBars(game);
     }
   }
 

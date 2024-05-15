@@ -130,6 +130,8 @@ export class Player {
 				this.shoot_angle = -this.shoot_angle_array[this.shoot_angle_index];
 			}
 		}
+
+		this.processContinuousKeys();
 	}
 
 	handleKeyup(game, key) {
@@ -149,6 +151,8 @@ export class Player {
 		if (key == this.BALL_KEY) {
 			this.ball_key_processed = false;
 		}
+
+		this.processContinuousKeys();
 	}
 
 
@@ -291,7 +295,6 @@ export class Player {
 				}
 			}
 		});
-
 
 		this.processContinuousKeys();
 	}

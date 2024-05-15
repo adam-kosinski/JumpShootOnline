@@ -26,10 +26,11 @@ export class Game {
 		//note: hats required to be .png b/c of how display.js figures out the image src
 
 		//time variables
-		this.start_timestamp = Date.now() / 1000; // only things labeled 'timestamp' are absolute times, all others in the code are relative to this, allows initializing times to 0
-		this.last_update_timestamp = 0;
+		this.start_timestamp = Date.now(); // only things labeled 'timestamp' are absolute times, all others in the code are relative to this, allows initializing times to 0
 
 		this.init();
+
+		this.initial_state = JSON.parse(JSON.stringify(this));
 	}
 
 	init() {
@@ -77,46 +78,68 @@ export class Game {
 	}
 
 
-	update(up_to_timestamp) {
-		// process queued actions and update positions, up to the timestamp given
+	update(target_timestamp) {
+		// process queued actions and update positions, so that the game is at the timestamp passed in
 
+		// make sure the key action queue is always in order
+		this.key_action_queue.sort((a, b) => a.timestamp - b.timestamp);
+
+		// start with initial state and then process all key actions up to the desired timestamp
+		// don't overwrite key action queue though
+		const key_action_queue = this.key_action_queue;
+		Game.loadFromJson(this.initial_state, this);
+		this.key_action_queue = key_action_queue;
+
+		console.log("x initial", this.players[0].x)
+	
 		// go through queued actions
-		while(this.key_action_queue[0]?.timestamp <= up_to_timestamp){
-			const { player_name, action, key, timestamp } = this.key_action_queue.splice(0, 1)[0];
+		for(let key_action of this.key_action_queue) {
+
+			// if we reached the end of the relevant actions, stop
+			if(key_action.timestamp > target_timestamp) break;
 
 			// update positions up to this point
-			this.updatePositions(timestamp);
-			// process the action
-			const player = this.players.find(p => p.name === player_name);
-			if(player){
-				if(action === "keydown") player.handleKeydown(this, key);
-				if(action === "keyup") player.handleKeyup(this, key);
-			}
-		}
-		// update positions to the final timestamp
-		this.updatePositions(up_to_timestamp);
+			this.updatePositions(key_action.timestamp);
 
-		this.last_update_timestamp = up_to_timestamp;
+			// process the action
+			const player = this.players.find(p => p.name === key_action.player_name);
+			if(player){
+				if(key_action.action === "keydown") player.handleKeydown(this, key_action.key);
+				if(key_action.action === "keyup") player.handleKeyup(this, key_action.key);
+			}
+
+			console.log(`t=${(key_action.timestamp - this.start_timestamp) / 1000} x=${this.players[0].x} ${key_action.action} ${key_action.key} [${this.players[0].keys_down}]`)
+		}
+
+		// update positions to the final timestamp
+		this.updatePositions(target_timestamp);
+
+		console.log(`t=${(target_timestamp - this.start_timestamp)/1000} x=${this.players[0].x}`)
+		console.log("-----")
 	}
 
 
 	updatePositions(timestamp) { // time is an argument, because we sometimes do updates in chunks to calculate position changes between player inputs
-		const t_since_start = timestamp / 1000 - this.start_timestamp;
+		const t_since_start = (timestamp - this.start_timestamp) / 1000;
 		//update balls and players - do players before balls because carried ball position depends on player position
 		this.players.forEach(p => p.updatePosition(this, t_since_start));
 		this.balls.forEach(b => b.updatePosition(this, t_since_start));
 	}
 
 
-	static loadFromJson(json_game) {
-		// returns a new game object with players, balls etc. being instances of their respective classes
+	static loadFromJson(json_game, target_game=undefined) {
+		// returns a game object with players, balls etc. being instances of their respective classes
+		// if target_game (of class Game) is passed, copies json_game into target_game as well
+
+		// make sure no references are hanging around
+		json_game = JSON.parse(JSON.stringify(json_game));
 
 		// get a new object with the same methods, and copy over shallow properties
-		const game = Object.create(Game.prototype);
+		const game = target_game ? target_game : Object.create(Game.prototype);
 		Object.assign(game, json_game);
 
 		// recreate players, walls, and balls which need specific prototypes
-		// these only have shallow properties, so the properties can be directly copied
+		// properties can be directly copied since their default prototypes are correct
 		game.players = [];
 		for (let p of json_game.players) {
 			const player_copy = Object.create(Player.prototype);

@@ -8,7 +8,6 @@ let am_spectator;
 // local copy of the game, so we can do prediction to compensate for latency
 import { Game } from "./Game.js"
 let local_game_state;
-let prev_local_game_state; // for detecting when a player was hit
 
 
 //CONNECTION TO SERVER -----------------------------------
@@ -109,7 +108,6 @@ socket.on("start_game", function (game) {
 
 	// reset local game state - will get reinitialized from game updates
 	local_game_state = undefined;
-	prev_local_game_state = undefined;
 });
 
 socket.on("clear_game", function () {
@@ -120,18 +118,15 @@ socket.on("clear_game", function () {
 
 
 socket.on("update", async function (game) {
-	// update my local copy of the game
-	prev_local_game_state = local_game_state;
 	local_game_state = Game.loadFromJson(game);
-
-	// updateGameDisplay(game)
+	updateGameDisplay(game);
 });
 
-const LOCAL_LOOP_FREQ = 40; // hz
+const LOCAL_LOOP_FREQ = 10; // hz
 setInterval(() => {
 	if (!local_game_state) return;
 	local_game_state.update(Date.now());
-	updateGameDisplay(local_game_state, prev_local_game_state);
+	// updateGameDisplay(local_game_state);
 }, 1000 / LOCAL_LOOP_FREQ);
 
 
@@ -148,6 +143,7 @@ document.getElementById("clear_game_button").addEventListener("click", clearGame
 
 function handleKeydown(e) {
 	if (am_spectator) return;
+	if (e.repeat) return;
 	socket.emit("keydown", e.key, Date.now());
 	local_game_state.queueKeyAction(my_name, "keydown", e.key, Date.now());
 }
