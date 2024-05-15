@@ -158,7 +158,7 @@ io.on("connection", function(socket) {
     if(!game.isValidKeyAction(key_action)) return;
 
     // fake latency
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     // add action to queue
     game.key_action_queue.push(key_action);

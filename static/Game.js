@@ -82,49 +82,6 @@ export class Game {
 	}
 
 
-	// update(target_timestamp) {
-	// 	// process queued actions and update positions, so that the game is at the timestamp passed in
-
-	// 	// make sure the key action queue is always in order
-	// 	this.key_action_queue.sort((a, b) => a.timestamp - b.timestamp);
-
-	// 	// start with initial state and then process all key actions up to the desired timestamp
-	// 	// don't overwrite key action queue though
-	// 	const key_action_queue = this.key_action_queue;
-	// 	Game.loadFromJson(this.initial_state, this);
-	// 	this.key_action_queue = key_action_queue;
-
-	// 	console.log("x initial", this.players[0].x)
-
-	// 	// go through queued actions
-	// 	for(let key_action of this.key_action_queue) {
-
-	// 		// if we reached the end of the relevant actions, stop
-	// 		if(key_action.timestamp > target_timestamp) break;
-
-	// 		// update positions up to this point
-	// 		this.updatePositions(key_action.timestamp);
-
-	// 		// process the action
-	// 		const player = this.players.find(p => p.name === key_action.player_name);
-	// 		if(player){
-	// 			if(key_action.action === "keydown") player.handleKeydown(this, key_action.key);
-	// 			if(key_action.action === "keyup") player.handleKeyup(this, key_action.key);
-	// 		}
-
-	// 		console.log(`t=${(key_action.timestamp - this.start_timestamp) / 1000} x=${this.players[0].x} ${key_action.action} ${key_action.key} [${this.players[0].keys_down}]`)
-	// 	}
-
-	// 	// update positions to the final timestamp
-	// 	console.log(this.players[0].y_collision)
-	// 	this.updatePositions(target_timestamp);
-	// 	console.log(this.players[0].y_collision)
-
-	// 	console.log(`t=${(target_timestamp - this.start_timestamp)/1000} x=${this.players[0].x}`)
-	// 	console.log("-----")
-	// }
-
-
 	update(target_timestamp) {
 		// process queued actions and update positions, so that the game is at the timestamp passed in
 
