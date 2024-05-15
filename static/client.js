@@ -4,6 +4,9 @@ let socket = io();
 let my_name;
 let am_spectator;
 
+let key_action_seq_num = 0;
+let pending_key_actions = [];
+
 // local copy of the game, so we can do prediction to compensate for latency
 import { Game } from "./Game.js"
 let local_game_state;
@@ -48,11 +51,6 @@ async function registerName(name) {
 	});
 }
 
-
-//store the id of the connection
-socket.on("connect", function () {
-	console.log("My ID: " + socket.id);
-});
 
 
 //if disconnect, don't try to reconnect - that would mess up the id_to_name database in the server
@@ -118,15 +116,30 @@ socket.on("clear_game", function () {
 
 
 socket.on("update", async function (game) {
-	if(!local_game_state) local_game_state = Game.loadFromJson(game);
-	updateGameDisplay(game);
+	// update pending key actions to figure out which ones haven't been processed by the server as part of this game state
+	const new_pending_key_actions = [];
+	for(let key_action of pending_key_actions){
+		// if can't find this action in the game state, the server hasn't processed it
+		if(!game.key_action_queue?.find(a => a.player_name === key_action.player_name && a.seq_num === key_action.seq_num)){
+			new_pending_key_actions.push(key_action);
+		}
+	}
+	pending_key_actions = new_pending_key_actions;
+
+	// update local game state
+	local_game_state = Game.loadFromJson(game);
+
+	// updateGameDisplay(game);
 });
 
 const LOCAL_LOOP_FREQ = 40; // hz
 setInterval(() => {
 	if (!local_game_state) return;
+	// add in any missing key actions that we know about but the server didn't
+	local_game_state.key_action_queue = local_game_state.key_action_queue.concat(pending_key_actions);
+	// update and draw
 	local_game_state.update(Date.now());
-	// updateGameDisplay(local_game_state);
+	updateGameDisplay(local_game_state);
 }, 1000 / LOCAL_LOOP_FREQ);
 
 
@@ -145,12 +158,17 @@ function handleKeyEvent(e) {
 	if (am_spectator) return;
 	if (e.repeat) return;
 
-	socket.emit("key_action", {
+	const key_action = {
 		player_name: my_name,
 		action: e.type,
 		key: e.key,
-		timestamp: Date.now()
-	});
+		timestamp: Date.now(),
+		seq_num: key_action_seq_num
+	}
+
+	socket.emit("key_action", key_action);
+	pending_key_actions.push(key_action);
+	key_action_seq_num++;
 }
 
 function startGame() { //from home screen

@@ -126,7 +126,7 @@ io.on("connection", function(socket) {
     game_interval = setInterval(function(){
       game.update(Date.now());
       io.emit("update", game);
-    }, 1000 / 40);  // 1000ms divided by loop freq in hz
+    }, 1000 / 10);  // 1000ms divided by loop freq in hz
 
     io.emit("start_game", game); //let everyone know
   });

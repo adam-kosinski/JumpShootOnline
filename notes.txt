@@ -6,8 +6,14 @@ And don't need to keep track of connected / disconnected in a player status
 - oh wait I remember why we did this - to prevent more than one connection at a time from accessing / being a certain player
 - feels like there might be some way to hack this hmm
 
-With latency and just drawing the server's states, the bunny does a weird jump-forward then jump-backward thing when moving sideways.
-Seems a bit similar to the keys-down-list-not-being-independent-when-copied bug I had before
+With latency and just drawing the server's states, the bunny does a jump-forward then jump-backward thing when moving sideways.
+- the jump forwards is due to the server realizing that the bunny has been moving for a bit already when it receives the keydown action
+- the jump back is the server realizing (when receiving the keyup action) that the bunny had previously stopped instead of continuing to move
+
+There's a bug with changing the launch angle - weird flickering
+
+Need to update our starting game state for history recalculation more intelligently. Starting from the initial state slows things down eventually.
+Involves some fiddling with the key action queue, so we only process the key actions that haven't already been processed for that game state.
 
 
 DONE

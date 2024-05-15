@@ -74,7 +74,7 @@ export class Game {
 	
 	isValidKeyAction(key_action) {
 		if(typeof(key_action) !== "object") return false;
-		if(!"player_name" in key_action || !"action" in key_action || !"key" in key_action || !"timestamp" in key_action) return false;
+		if(!("player_name" in key_action) || !("action" in key_action) || !("key" in key_action) || !("timestamp" in key_action) || !("seq_num" in key_action)) return false;
 		if(!this.players.find(p => p.name === key_action.player_name)) return false;
 		if(!(key_action.action === "keydown" || key_action.action === "keyup")) return false;
 		if(typeof(key_action.timestamp) !== "number" || key_action.timestamp < 0) return false;
@@ -125,7 +125,7 @@ export class Game {
 	// }
 
 
-	update(target_timestamp, json_game) {
+	update(target_timestamp) {
 		// process queued actions and update positions, so that the game is at the timestamp passed in
 
 		// make sure the key action queue is always in order
