@@ -220,3 +220,12 @@ function clearGame() {
 		}
 	});
 })();
+
+
+setInterval(() => {
+	const t0 = performance.now();
+	socket.emit("get_state", () => {
+		const latency = performance.now() - t0;
+		document.getElementById("latency").textContent = latency.toFixed(2) + " ms";
+	});
+}, 1000)

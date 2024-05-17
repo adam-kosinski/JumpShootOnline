@@ -69,8 +69,8 @@ function updateGameDisplay(game) {
 
   //play chungus chuckle for each rabbit that just got hurt and update health display
   for (let i = 0; i < game.players.length; i++) {
-    const prev_displayed_health = document.getElementById("player" + i + "_hearts").childElementCount;
-    if (game.players[i].health !== prev_displayed_health) {
+    const prev_displayed_health = document.getElementById("player" + i + "_hearts")?.childElementCount;
+    if (prev_displayed_health !== null && game.players[i].health !== prev_displayed_health) {
       chuckle.play(); //loaded at the top of this file
       updateHealthBars(game);
     }
