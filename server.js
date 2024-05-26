@@ -15,8 +15,8 @@ let app = express();
 let server;
 try {
   server = https.createServer({
-    key: readFileSync("/home/amk119/locksmith-ssl-cert/rsa_private_key"),
-    cert: readFileSync("/home/amk119/locksmith-ssl-cert/bundle_root_last")
+    key: readFileSync("/home/amk119/locksmith-ssl-cert/rsa_private_key.pem"),
+    cert: readFileSync("/home/amk119/locksmith-ssl-cert/bundle_root_last.pem")
   }, app)
 }
 catch {
