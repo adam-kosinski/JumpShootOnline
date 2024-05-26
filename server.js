@@ -15,8 +15,8 @@ let app = express();
 let server;
 try {
   server = https.createServer({
-    key: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/privkey.pem"),
-    cert: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/fullchain.pem")
+    key: readFileSync("~/locksmith-ssl-cert/rsa_private_key"),
+    cert: readFileSync("~/locksmith-ssl-cert/fullchain_root_last")
   }, app)
 }
 catch {
