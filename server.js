@@ -3,6 +3,8 @@
 import express from "express";
 import { Server as SocketIOServer } from "socket.io";
 import { createServer } from "http";
+import https from "https";
+import { read, readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -10,7 +12,11 @@ import { Game } from "./static/Game.js"
 
 //app stuff
 let app = express();
-let server = createServer(app);
+// let server = createServer(app);
+let server = https.createServer({
+  key: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/privkey.pem"),
+  cert: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/fullchain.pem")
+}, app)
 let io = new SocketIOServer(server);
 
 app.set("port", 5000);
