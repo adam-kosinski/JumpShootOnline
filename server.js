@@ -2,9 +2,9 @@
 
 import express from "express";
 import { Server as SocketIOServer } from "socket.io";
-import { createServer } from "http";
+import http from "http";
 import https from "https";
-import { read, readFileSync } from "fs";
+import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -12,11 +12,18 @@ import { Game } from "./static/Game.js"
 
 //app stuff
 let app = express();
-// let server = createServer(app);
-let server = https.createServer({
-  key: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/privkey.pem"),
-  cert: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/fullchain.pem")
-}, app)
+let server;
+try {
+  server = https.createServer({
+    key: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/privkey.pem"),
+    cert: readFileSync("/etc/letsencrypt/live/adam-k.colab.duke.edu/fullchain.pem")
+  }, app)
+}
+catch {
+  console.log("SSL certificate files not found for adam-k.colab.duke.edu, running on HTTP")
+  server = http.createServer(app);
+}
+
 let io = new SocketIOServer(server);
 
 app.set("port", 5000);
@@ -24,22 +31,22 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 app.use('/static', express.static(join(__dirname, 'static')))
 
 // Routing
-app.get("/", function(request, response) {
+app.get("/", function (request, response) {
   response.sendFile(__dirname + "/index.html");
 });
 
 // Starts the server.
 let port = process.env.PORT;
-if(port == null || port == ""){
-	port = 5000;
+if (port == null || port == "") {
+  port = 5000;
 }
-server.listen(port, function() {
-  console.log("Starting server on port "+port);
+server.listen(port, function () {
+  console.log("Starting server on port " + port);
 });
 
 //CLASSES ------------------------------------------------------
 class PlayerStatus {
-  constructor(name){
+  constructor(name) {
     this.name = name;
     this.connected = true; //because when we make one of these, it's triggered by a connected player
   }
@@ -56,12 +63,12 @@ let game_interval = undefined; //stores the setInterval return value for the gam
 
 
 // WEBSOCKET HANDLERS --------------------------------------------------------------------------------------------------------------------
-io.on("connection", function(socket) {
+io.on("connection", function (socket) {
 
 
   // PLAYER CONNECTIONS ----------------------------------------------
 
-	socket.on("new player", function(name, callback){
+  socket.on("new player", function (name, callback) {
     //return: "success" or "duplicate" or "spectator"
 
     /* LOGIC:
@@ -76,18 +83,18 @@ io.on("connection", function(socket) {
     */
 
     //check if this player exists
-    if(!player_statuses.hasOwnProperty(name)){
+    if (!player_statuses.hasOwnProperty(name)) {
       //make a player status for them
       console.log("New player status created for: " + name + " (id: " + socket.id + ")");
-			player_statuses[name] = new PlayerStatus(name);
-			id_to_name[socket.id] = name;
+      player_statuses[name] = new PlayerStatus(name);
+      id_to_name[socket.id] = name;
     }
     //if player exists, check if duplicate name
-    else if(player_statuses[name].connected){
-			console.log(name + " is a duplicate name - asking them to try another");
-			callback("duplicate"); //duplicate name, tell the client it's invalid
+    else if (player_statuses[name].connected) {
+      console.log(name + " is a duplicate name - asking them to try another");
+      callback("duplicate"); //duplicate name, tell the client it's invalid
       return; //stop right here, this doesn't count as a valid connection
-		}
+    }
     else {
       console.log(name + " reconnected (id: " + socket.id + ")");
     }
@@ -98,30 +105,30 @@ io.on("connection", function(socket) {
 
 
     //figure out if spectator or not and tell client
-    if(game != undefined && !game.player_names.includes(name)) callback("spectator");
+    if (game != undefined && !game.player_names.includes(name)) callback("spectator");
     else callback("not spectator");
 
     io.emit("player_connection", player_statuses);
 
-	});
+  });
 
-	//mark player as disconnected when they leave
-	socket.on("disconnect", function(){
-		if(id_to_name.hasOwnProperty(socket.id)){
-			console.log(id_to_name[socket.id]+" disconnected (id: " + socket.id + ")");
-			let player = player_statuses[id_to_name[socket.id]];
-			player.connected = false;
-			delete id_to_name[socket.id];
-		}
-		io.emit("player_connection", player_statuses);
-	});
+  //mark player as disconnected when they leave
+  socket.on("disconnect", function () {
+    if (id_to_name.hasOwnProperty(socket.id)) {
+      console.log(id_to_name[socket.id] + " disconnected (id: " + socket.id + ")");
+      let player = player_statuses[id_to_name[socket.id]];
+      player.connected = false;
+      delete id_to_name[socket.id];
+    }
+    io.emit("player_connection", player_statuses);
+  });
 
-	socket.on("get_state", function(callback){
-		callback(player_statuses, game); //if game is undefined, tells them no game currently happening
-	});
+  socket.on("get_state", function (callback) {
+    callback(player_statuses, game); //if game is undefined, tells them no game currently happening
+  });
 
 
-  socket.on("start_game", function(replaying=false){ //if for an immediate new game, keep same players
+  socket.on("start_game", function (replaying = false) { //if for an immediate new game, keep same players
     console.log("Starting new game! - replaying: " + replaying);
 
     let player_names = (replaying && game) ? game.player_names : Object.keys(player_statuses);
@@ -129,7 +136,7 @@ io.on("connection", function(socket) {
     game = new Game(player_names);
 
     //start game loop - note this will run slightly slower than expected b/c of setInterval, but that's fine because we're using Date.now() for timings (see Game.update)
-    game_interval = setInterval(function(){
+    game_interval = setInterval(function () {
       game.update(Date.now());
       io.emit("update", game);
     }, 1000 / 10);  // 1000ms divided by loop freq in hz
@@ -138,12 +145,12 @@ io.on("connection", function(socket) {
   });
 
 
-  socket.on("end_game", function(replaying=false){
+  socket.on("end_game", function (replaying = false) {
     console.log("Ending game");
-    if(game_interval !== undefined) clearInterval(game_interval);
+    if (game_interval !== undefined) clearInterval(game_interval);
     game_interval = undefined;
 
-    if(!replaying){
+    if (!replaying) {
       game = undefined; //to start an immediate new game, need to know what the previous game's players were, don't clear this in that case
       io.emit("clear_game");
     }
@@ -160,8 +167,8 @@ io.on("connection", function(socket) {
 
   socket.on("key_action", async key_action => {
     // check if valid action
-    if(!game) return;
-    if(!game.isValidKeyAction(key_action)) return;
+    if (!game) return;
+    if (!game.isValidKeyAction(key_action)) return;
 
     // fake latency
     await new Promise(resolve => setTimeout(resolve, 100))
